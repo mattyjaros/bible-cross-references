@@ -13,7 +13,12 @@ npm run check      # types, lint, formatting, unit tests, coverage thresholds
 npm run test:e2e   # the reader's flows, in a real browser against the built site
 ```
 
-`npm run check` is the same command CI runs, so if it passes locally it passes there. It fails on:
+`npm run check` is most of what CI runs, so if it passes locally it almost certainly passes there.
+The exception is the generated datasets: `npm run check` never reads them, because it runs beside
+the build rather than after it, so CI has one further gate — `npm run test:built`, after
+`npm run data:build`, which checks the real scripture rather than a fixture. Run those two
+together after any change to `data/sources.json`, an importer or a translation. `npm run check`
+fails on:
 
 - a TypeScript error (the config is strict, including `noUncheckedIndexedAccess` and
   `exactOptionalPropertyTypes`; there is no `any` and no `!`, and `as` appears only where
@@ -108,9 +113,12 @@ reads the language is still the only thing standing between these and a reader:
 - **The share picture.** CI checks that it exists, has its own URL, is the declared size and
   says whether it is a stand-in. Nothing can read the words drawn on it.
 
-A Bible text is checked far more loosely than a language: the registry forces the bookkeeping,
-and the verse numbering is enforced when the dataset is built, but the licence, the attribution
-and the reading direction are taken on trust. Read those by hand.
+A Bible text is checked more loosely than a language: the registry forces the bookkeeping, and
+the verse numbering is enforced when the dataset is built. `npm run test:built` adds that the
+built file carries a licence and a credit at all, that its provenance is the pin the build
+verified, and that no bracket is left open across two verses — but whether the licence named is
+the right one, whether the credit is accurate, and the reading direction are still taken on
+trust. Read those by hand.
 
 ### A Bible text
 

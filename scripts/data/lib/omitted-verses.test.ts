@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseOsisId } from '../../../src/core/bible/verse-ref.ts';
 import { CANONICAL_VERSIFICATION } from '../../../src/core/bible/versification.ts';
+import { TRANSLATION_IDS } from '../../../src/core/datasets/ids.ts';
 import { CRITICAL_TEXT_OMISSIONS, omittedVerseNotices } from './omitted-verses.ts';
 
 describe('omittedVerseNotices', () => {
@@ -82,17 +83,36 @@ describe('omittedVerseNotices', () => {
    * asked again of whatever is added next.
    */
   describe('the allowance each translation gets', () => {
-    it.each(['kjv', 'blivre', 'luther1912', 'riveduta1927'] as const)(
+    const PRINTS_ALL_SIXTEEN = ['kjv', 'blivre', 'luther1912', 'riveduta1927'] as const;
+    const LEAVES_THEM_OUT = ['bsb', 'vbl'] as const;
+
+    it.each(PRINTS_ALL_SIXTEEN)(
       'refuses a critical-text blank in %s, which prints all sixteen',
       (id) => {
         expect(() => omittedVerseNotices(id, ['Matt.17.21'])).toThrow(/Matt\.17\.21/);
       },
     );
 
-    it.each(['bsb', 'vbl'] as const)('allows it in %s, which leaves them out', (id) => {
+    it.each(LEAVES_THEM_OUT)('allows it in %s, which leaves them out', (id) => {
       const notices = omittedVerseNotices(id, ['Matt.17.21']);
       expect(notices).toHaveLength(1);
       expect(notices[0]?.message).toMatch(/earliest manuscripts/);
+    });
+
+    /**
+     * The two lists above are what makes the paragraph over them true, and a translation added
+     * to neither is simply not asked the question. The compiler cannot notice: it checks
+     * `OMISSIONS_ALLOWED` covers every id, and `NO_OMISSIONS` is a perfectly typed answer for a
+     * text nobody has read. This is the check that fails until someone says which of the two a
+     * new edition is. It proves the lists agree with `OMISSIONS_ALLOWED`, not that whoever
+     * classified the edition read it — that part is still a reviewer's job.
+     */
+    it('asks it of every translation the app ships', () => {
+      const asked: readonly string[] = [...PRINTS_ALL_SIXTEEN, ...LEAVES_THEM_OUT];
+      expect(
+        TRANSLATION_IDS.filter((id) => !asked.includes(id)),
+        'add it to PRINTS_ALL_SIXTEEN or LEAVES_THEM_OUT, whichever its edition does',
+      ).toEqual([]);
     });
   });
 });

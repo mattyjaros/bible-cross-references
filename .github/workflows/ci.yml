@@ -69,6 +69,15 @@ jobs:
             echo 'Run `npm run data:build` and commit the updated manifest with your change.'
             exit 1
           fi
+      # The unit gate runs beside this job, so it never sees the generated scripture: a fixture
+      # holds whatever a test wrote into it. These checks read the real datasets instead, and
+      # stand down per translation when one is absent — which is every run of `npm run check`,
+      # so REQUIRE_BUILT_DATASETS makes absence a failure on the one job that has them.
+      - name: The generated datasets hold what they claim
+        env:
+          REQUIRE_BUILT_DATASETS: '1'
+        run: npm run test:built
+
       - name: Keep the built site for the end-to-end tests
         uses: actions/upload-artifact@v7
         with:
