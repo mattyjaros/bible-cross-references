@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { type BookId } from '../../core/bible/books.ts';
 import { getBookGenre } from '../../core/bible/genres.ts';
-import { chapterPassageOf, versePassage, type Passage } from '../../core/bible/passage.ts';
+import {
+  chapterPassageOf,
+  formatPassage,
+  versePassage,
+  type Passage,
+} from '../../core/bible/passage.ts';
 import type { VerseIndex } from '../../core/bible/verse-ref.ts';
-import { NextIcon, PreviousIcon } from '../../shared/ui/icons.tsx';
+import { NextIcon, PreviousIcon, ShareVerseIcon } from '../../shared/ui/icons.tsx';
 import { collectConnections, type Connection } from '../shared/connections.ts';
 import type { LinkFilter } from '../shared/link-filter.ts';
 import { GENRE_COLORS } from '../shared/palette.ts';
 import { useElementSize } from '../shared/use-element-size.ts';
 import type { VizData } from '../shared/viz-data.ts';
+import { buildVerseShareRequest } from '../shared/verse-share.ts';
+import { openVerseShare } from '../shared/components/VerseShareDialog.tsx';
 import { FrameScheduler, MAX_PIXEL_RATIO } from '../shared/frames.ts';
 import { computeSpineLayout } from './spine-layout.ts';
 import { drawThreads, spineBar, type VerseAnchor } from './threads-drawing.ts';
@@ -30,6 +37,8 @@ interface ThreadsStageProps {
    */
   readonly preview: Connection | null;
   readonly onSelect: (passage: Passage | null) => void;
+  /** A verse's address on the published site, for a card that is about to be sent. */
+  readonly shareUrl: (passage: Passage) => string;
 }
 
 /** Scroll distance after which the chapter header condenses into a slim sticky bar. */
@@ -56,8 +65,10 @@ export function ThreadsStage({
   direction,
   preview,
   onSelect,
+  shareUrl,
 }: ThreadsStageProps) {
-  const { t, n, books, genreName } = useLocalization();
+  const localization = useLocalization();
+  const { t, n, books, genreName } = localization;
   const { versification, translation, crossReferences, verseGenres } = data;
   const readingRef = useRef<HTMLDivElement>(null);
   const canvasHostRef = useRef<HTMLDivElement>(null);
@@ -328,8 +339,36 @@ export function ThreadsStage({
                   <span className={text ? styles.text : `${styles.text} ${styles.omitted}`}>
                     {text || t('threads.omitted')(translation.manifest.abbreviation)}
                   </span>
-                  <span className={styles.count} title={t('arcs.connections')(n(count), count)}>
-                    {count > 0 ? n(count) : ''}
+                  <span className={styles.endSlot}>
+                    <span className={styles.count} title={t('arcs.connections')(n(count), count)}>
+                      {count > 0 ? n(count) : ''}
+                    </span>
+                    {/* A verse this translation leaves out has nothing to put on a card. */}
+                    {text !== '' && (
+                      <button
+                        type="button"
+                        className={styles.share}
+                        aria-label={t('share.verse')(
+                          formatPassage(versePassage(verse), versification, books),
+                        )}
+                        onClick={(event) => {
+                          // The row itself selects the verse; sending it on is a different
+                          // answer to the same tap, so it must not also move the reader.
+                          event.stopPropagation();
+                          openVerseShare(
+                            buildVerseShareRequest({
+                              data,
+                              filter,
+                              verse,
+                              url: shareUrl(versePassage(verse)),
+                              localization,
+                            }),
+                          );
+                        }}
+                      >
+                        <ShareVerseIcon />
+                      </button>
+                    )}
                   </span>
                 </li>
               );

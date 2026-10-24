@@ -141,6 +141,7 @@ export function ThreadsExplorer({
         direction={direction}
         preview={previewed}
         onSelect={onNavigate}
+        shareUrl={shareUrl}
       />
     </VizPage>
   );

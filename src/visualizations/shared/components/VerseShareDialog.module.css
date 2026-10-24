@@ -1,0 +1,188 @@
+/* The card, and the ways of sending it. On a phone the dialog meets the bottom edge, where a
+   thumb already is; on a desktop it floats. Both show the picture first, at the proportions it
+   will actually arrive in, because the preview is the only promise the dialog makes. */
+.dialog {
+  margin: auto;
+  padding: 0;
+  inline-size: min(24rem, calc(100vw - 2rem));
+  max-block-size: calc(100dvh - 2rem);
+  /* The sheet is taller than a phone held sideways. Without a scroll container every action in
+     it sits below the fold, reachable by neither finger nor pointer — only Escape. `auto`, as
+     the install guide has always had. */
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.875rem;
+  background: var(--color-surface);
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.45);
+  color: var(--color-text);
+  opacity: 0;
+  translate: 0 0.75rem;
+  transition:
+    opacity 0.2s ease,
+    translate 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dialog[open] {
+  opacity: 1;
+  translate: none;
+}
+
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 0);
+  transition: background-color 0.2s ease;
+}
+
+.dialog[open]::backdrop {
+  background: rgb(0 0 0 / 0.55);
+}
+
+@starting-style {
+  .dialog[open]::backdrop {
+    background: rgb(0 0 0 / 0);
+  }
+}
+
+/* On a phone it is a sheet: full width, anchored to the bottom, clear of the home indicator. */
+@media (max-width: 30rem) {
+  .dialog {
+    margin: auto auto 0;
+    inline-size: 100vw;
+    max-block-size: calc(100dvh - 3rem);
+    border-width: 1px 0 0;
+    border-radius: 0.875rem 0.875rem 0 0;
+  }
+
+  .sheet {
+    padding-block-end: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) - 2px);
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus-visible {
+  color: var(--color-text);
+}
+
+/* The preview holds the card's own proportions whether or not it has arrived, so that nothing
+   below it moves when it does. */
+.preview {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #0d0d0d;
+}
+
+.card {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.placeholder {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-block-size: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) - 2px);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.action:hover,
+.action:focus-visible {
+  border-color: var(--color-text-muted);
+}
+
+/* An odd last action would otherwise sit alone in half a row, which reads as a missing button
+   rather than a deliberate one. It takes the whole row instead. */
+.actions > .action:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* Share stands above the pairs, full width: on a phone it is the one that matters, and the rest
+   are what somebody reaches for when it was not what they wanted. */
+.primary {
+  border-color: var(--color-text-muted);
+  background: var(--color-surface-muted);
+  font-weight: 500;
+}
+
+/* Says that something was copied, for a reader who cannot see the button's label change. */
+.visuallyHidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

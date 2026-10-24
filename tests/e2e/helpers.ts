@@ -43,6 +43,22 @@ export async function openPanel(page: Page): Promise<void> {
   await expect(handle).toHaveAttribute('aria-expanded', 'true');
 }
 
+/**
+ * Opens the share sheet on the verse the page is showing, and waits for its card to be drawn.
+ *
+ * The share button is found by what it is not: a verse row holds two buttons, and only the verse
+ * number carries `aria-pressed`. Picking it that way keeps this working in all six languages,
+ * where its label is a different word each time.
+ */
+export async function openShare(page: Page): Promise<void> {
+  const row = page.locator(`${ACTIVE} ol li[data-selected="true"]`).first();
+  await row.scrollIntoViewIfNeeded();
+  await row.hover();
+  await row.locator('button:not([aria-pressed])').first().click();
+  await page.locator('dialog[open] img').waitFor({ state: 'visible' });
+  await settle(page);
+}
+
 /** Opens a passage straight from its address, with its details in full view. */
 export async function openPassage(page: Page, ref: string, query = ''): Promise<void> {
   await page.goto(`./?ref=${ref}${query}`);

@@ -206,6 +206,17 @@ export const uk: LocaleMessages = {
   'threads.stage':
     'Лінії від віршів цієї глави до місць у Біблії, куди ведуть їхні перехресні ' +
     'посилання; Біблія показана вертикальною смугою з усіх 66 книг.',
+  'share.verse': (reference) => `Поділитися: ${reference}`,
+  'share.preview': (reference) => `${reference}, намальований як картка`,
+  'share.preparing': 'Малюємо картку…',
+  'share.failed': 'Не вдалося намалювати картку.',
+  'share.send': 'Поділитися',
+  'share.save': 'Зберегти зображення',
+  'share.copyText': 'Копіювати текст',
+  'share.copyLink': 'Копіювати посилання',
+  'share.copied': 'Скопійовано',
+  'share.crossReferences': (count, plural) =>
+    `${count} ${formOf(plural, 'перехресне посилання', 'перехресні посилання', 'перехресних посилань')}`,
   'arcs.connections': (count, plural) =>
     `${count} ${formOf(plural, 'зв’язок', 'зв’язки', 'зв’язків')}`,
   'arcs.stage':

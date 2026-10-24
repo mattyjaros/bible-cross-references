@@ -81,6 +81,9 @@ export default defineConfig(({ command, isPreview = false }) => ({
         'src/visualizations/arcs/ArcsStage.tsx',
         'src/visualizations/shared/components/LoadingArcs.tsx',
         'src/visualizations/threads/threads-drawing.ts',
+        // The share card's canvas and PNG encoding, which this environment has neither of. What
+        // it draws is `verse-card.ts` and what it decides is `verse-card-layout.ts`, both tested.
+        'src/visualizations/shared/verse-card-image.ts',
         'src/visualizations/threads/ThreadsStage.tsx',
         'src/visualizations/shared/glow.ts',
         'src/visualizations/shared/instanced-templates.ts',

@@ -176,6 +176,17 @@ export const es: LocaleMessages = {
   'threads.stage':
     'Hilos desde los versículos de este capítulo hasta los lugares de la Biblia adonde llevan ' +
     'sus referencias cruzadas; la Biblia es la barra vertical con los 66 libros.',
+  'share.verse': (reference) => `Compartir ${reference}`,
+  'share.preview': (reference) => `${reference}, dibujado como una tarjeta`,
+  'share.preparing': 'Dibujando la tarjeta…',
+  'share.failed': 'No se pudo dibujar la tarjeta.',
+  'share.send': 'Compartir',
+  'share.save': 'Guardar imagen',
+  'share.copyText': 'Copiar texto',
+  'share.copyLink': 'Copiar enlace',
+  'share.copied': 'Copiado',
+  'share.crossReferences': (count, plural) =>
+    plural === 1 ? '1 referencia cruzada' : `${count} referencias cruzadas`,
   'arcs.connections': (count, plural) =>
     plural === 1 ? `${count} conexión` : `${count} conexiones`,
   'arcs.stage':

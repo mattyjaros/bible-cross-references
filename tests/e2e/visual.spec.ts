@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { ACTIVE, PANEL, openPanel, settle, waitForApp } from './helpers.ts';
+import { ACTIVE, PANEL, openPanel, openShare, settle, waitForApp } from './helpers.ts';
 import { DEFAULT_LOCALE_ID, LOCALE_IDS } from '../../src/i18n/locale-id.ts';
 
 /**
@@ -435,6 +435,45 @@ async function foldEverySection(page: Page): Promise<void> {
 }
 
 /**
+ * The verse card, and the button that offers it.
+ *
+ * The button's shot is framed on the verse list alone — DOM text, no canvas behind it — so it
+ * can be held to `EXACT`. That matters more here than elsewhere: this button shares a 2rem slot
+ * with the cross-reference count, and the first version of it left the count misaligned and the
+ * button hanging over the threads. The full-page budget absorbed both without complaint. A shot
+ * framed on the list would not have.
+ *
+ * The card itself is a bitmap drawn on a canvas, so its shot takes the usual budget.
+ */
+test.describe('sending a verse', () => {
+  test('the button, on the verse being read', async ({ page }) => {
+    await show(page, './threads/?ref=Ps.16.10');
+    const phone = test.info().project.name === 'visual-phone';
+    if (phone) {
+      // The whole list is taller than a phone screen, and Playwright captures an element past
+      // the viewport by scrolling it — during which `(hover: none)` stops matching, so the shot
+      // came back showing the count and no button at all: a baseline of the feature being
+      // absent, held to `EXACT`, which could never have failed. The selected row fits, so that
+      // is what is photographed.
+      const row = page.locator(`${ACTIVE} ol li[data-selected="true"]`).first();
+      await row.scrollIntoViewIfNeeded();
+      await settle(page);
+      await expect(row).toHaveScreenshot('share-button.png', EXACT);
+      return;
+    }
+    await page.locator(`${ACTIVE} ol li`).nth(5).hover();
+    await settle(page);
+    await expect(page.locator(`${ACTIVE} ol`)).toHaveScreenshot('share-button.png', EXACT);
+  });
+
+  test('the card it offers, and the ways of sending it', async ({ page }) => {
+    await show(page, './threads/?ref=Ps.16.8');
+    await openShare(page);
+    await expect(page.locator('dialog[open]')).toHaveScreenshot('share-card.png');
+  });
+});
+
+/**
  * The app in each language it speaks other than English.
  *
  * English is photographed screen by screen above. A translation is not, and does not need to be:
@@ -459,6 +498,12 @@ for (const locale of LOCALE_IDS.filter((id) => id !== DEFAULT_LOCALE_ID)) {
       await openPanel(page);
       await settle(page);
       await shotPanel(page, `${locale}-panel.png`);
+    });
+
+    test('the card, named and credited in this language', async ({ page }) => {
+      await show(page, `./threads/?lang=${locale}&ref=John.3.16`);
+      await openShare(page);
+      await expect(page.locator('dialog[open]')).toHaveScreenshot(`${locale}-share-card.png`);
     });
 
     test('the reading threads, whose spine is lettered too', async ({ page }) => {

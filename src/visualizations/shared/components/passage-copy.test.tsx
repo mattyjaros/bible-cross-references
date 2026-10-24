@@ -19,6 +19,8 @@ const DATA = createVizData(
   [{ from: JOHN_3_16, to: ROM_5_8, toEnd: ROM_5_9, votes: 50 }],
   new Map([
     [JOHN_3_16, 'For God so loved the world…'],
+    // Left out by this translation, as a handful of verses are in several of the real ones.
+    [JOHN_3_17, ''],
     [ROM_5_8, 'But God proves His love…'],
     [ROM_5_9, 'Therefore, since we have now been justified…'],
   ]),
@@ -120,29 +122,46 @@ describe('the copy button', () => {
   it('is not offered where the page cannot write to the clipboard', () => {
     Object.defineProperty(window, 'isSecureContext', { value: false, configurable: true });
     renderPanel();
-    expect(screen.queryByRole('button', { name: /Copy John 3:16/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Copy Romans/ })).toBeNull();
   });
 
-  it('copies the verse with its reference and a link', async () => {
+  /**
+   * The verse being read offers to be sent rather than copied: its words are a tap further in,
+   * inside the share sheet, beside the picture. The connections keep their own copy buttons,
+   * because a reference is a thing you quote rather than a thing you send as a picture.
+   */
+  it('is not on the verse itself, which offers to be shared instead', () => {
     renderPanel();
-    await userEvent.click(screen.getByRole('button', { name: 'Copy John 3:16 with a link' }));
+    expect(screen.queryByRole('button', { name: /Copy John 3:16/ })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Share John 3:16' })).toBeTruthy();
+  });
+
+  /** A card of a verse the translation leaves out would be a picture of nothing. */
+  it('offers no card for a verse this translation omits', () => {
+    renderPanel(versePassage(JOHN_3_17));
+    expect(screen.queryByRole('button', { name: /^Share / })).toBeNull();
+  });
+
+  it('copies a passage with its reference and a link', async () => {
+    renderPanel();
+    await userEvent.click(screen.getByRole('button', { name: /Copy Romans 5:8–9 with a link/ }));
     await waitFor(() => {
       expect(clipboard.writeText).toHaveBeenCalled();
     });
     const [written] = clipboard.writeText.mock.calls[0] ?? [];
-    expect(written).toContain('For God so loved the world…');
-    expect(written).toContain('John 3:16 (BSB)');
+    expect(written).toContain('But God proves His love…');
+    expect(written).toContain('Romans 5:8–9 (BSB)');
     expect(written).toContain('https://example.org/?ref=John.3.16');
   });
 
-  /** Each copy button has a status of its own; the verse's is the first on the page. */
+  /** Each copy button has a status of its own; the first connection's is the first on the page. */
   const verseStatus = () => screen.getAllByRole('status')[0];
 
   it('says so, and then stops saying so', async () => {
     renderPanel();
-    await userEvent.click(screen.getByRole('button', { name: 'Copy John 3:16 with a link' }));
+    await userEvent.click(screen.getByRole('button', { name: /Copy Romans 5:8–9 with a link/ }));
     await waitFor(() => {
-      expect(verseStatus()?.textContent).toBe('John 3:16 copied');
+      expect(verseStatus()?.textContent).toBe('Romans 5:8–9 copied');
     });
     await waitFor(
       () => {
@@ -152,18 +171,10 @@ describe('the copy button', () => {
     );
   });
 
-  it('copies a cross-referenced passage from its own button', async () => {
-    renderPanel();
-    await userEvent.click(screen.getByRole('button', { name: /Copy Romans 5:8–9 with a link/ }));
-    await waitFor(() => {
-      expect(clipboard.writeText).toHaveBeenCalled();
-    });
-  });
-
   it('says nothing when the clipboard refuses, and stays usable', async () => {
     clipboard.writeText.mockRejectedValueOnce(new Error('denied'));
     renderPanel();
-    await userEvent.click(screen.getByRole('button', { name: 'Copy John 3:16 with a link' }));
+    await userEvent.click(screen.getByRole('button', { name: /Copy Romans 5:8–9 with a link/ }));
     await waitFor(() => {
       expect(verseStatus()?.textContent).toBe('');
     });

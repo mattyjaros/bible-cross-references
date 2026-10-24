@@ -176,6 +176,17 @@ export const it: LocaleMessages = {
   'threads.stage':
     'Fili dai versetti di questo capitolo ai punti della Bibbia dove portano i loro riferimenti ' +
     'incrociati; la Bibbia è la barra verticale con tutti i 66 libri.',
+  'share.verse': (reference) => `Condividi ${reference}`,
+  'share.preview': (reference) => `${reference}, disegnato come una scheda`,
+  'share.preparing': 'Disegno della scheda…',
+  'share.failed': 'Non è stato possibile disegnare la scheda.',
+  'share.send': 'Condividi',
+  'share.save': 'Salva immagine',
+  'share.copyText': 'Copia testo',
+  'share.copyLink': 'Copia link',
+  'share.copied': 'Copiato',
+  'share.crossReferences': (count, plural) =>
+    plural === 1 ? '1 riferimento incrociato' : `${count} riferimenti incrociati`,
   'arcs.connections': (count, plural) =>
     plural === 1 ? `${count} collegamento` : `${count} collegamenti`,
   'arcs.stage':

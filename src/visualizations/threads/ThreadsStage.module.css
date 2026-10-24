@@ -205,6 +205,86 @@
   font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
   text-align: end;
+  transition: opacity 0.15s;
+}
+
+/* The row's end: how many links at rest, and how to send the verse on when somebody reaches for
+   it. One or the other, never both — the slot is 2rem wide and the count is ambient, while the
+   button is what the reach was for. The count stays in flow so the row keeps its baseline, and
+   the button floats over it. */
+.endSlot {
+  position: relative;
+  display: block;
+  /* The count was a grid item before it was wrapped, and a block is what made `text-align: end`
+     right-align the digits. As an inline span it aligns nothing, so the slot carries it now. */
+  text-align: end;
+}
+
+.share {
+  position: absolute;
+  /* Flush with the slot's end edge, so the button and the number it replaces share one right
+     edge, and centred on the digits rather than on the row: the slot is exactly a button wide
+     on a phone, and a hair of overhang puts it over the threads. */
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  /* Invisible is not the same as absent: a transparent button still takes the tap. Without this
+     a touch reader aiming at the count of any verse opened a share sheet instead of selecting
+     the verse, because the button sits over that number on every row and swallows the press.
+     Keyboard focus is unaffected, so Tab still reaches it and reveals it. */
+  pointer-events: none;
+  transition:
+    opacity 0.15s,
+    color 0.15s;
+}
+
+.verse:hover .share,
+.share:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.verse:hover .count {
+  opacity: 0;
+}
+
+.share:hover {
+  color: var(--color-text);
+}
+
+/* No hover on a touch screen, and thirty rows of buttons would be thirty invitations nobody
+   asked for. The verse they chose is the one that offers to be sent. */
+@media (hover: none) {
+  .verse:hover .share {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .verse:hover .count {
+    opacity: 1;
+  }
+
+  .verse[data-selected='true'] .share {
+    border-color: transparent;
+    background: none;
+    opacity: 0.75;
+    pointer-events: auto;
+  }
+
+  .verse[data-selected='true'] .count {
+    opacity: 0;
+  }
 }
 
 .canvasHost {

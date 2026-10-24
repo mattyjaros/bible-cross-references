@@ -178,6 +178,17 @@ export const de: LocaleMessages = {
   'threads.stage':
     'Fäden von den Versen dieses Kapitels zu den Stellen in der Bibel, auf die ihre ' +
     'Querverweise zeigen; die Bibel steht als senkrechter Balken aus allen 66 Büchern.',
+  'share.verse': (reference) => `${reference} teilen`,
+  'share.preview': (reference) => `${reference}, als Karte gezeichnet`,
+  'share.preparing': 'Die Karte wird gezeichnet…',
+  'share.failed': 'Die Karte konnte nicht gezeichnet werden.',
+  'share.send': 'Teilen',
+  'share.save': 'Bild sichern',
+  'share.copyText': 'Text kopieren',
+  'share.copyLink': 'Link kopieren',
+  'share.copied': 'Kopiert',
+  'share.crossReferences': (count, plural) =>
+    plural === 1 ? '1 Querverweis' : `${count} Querverweise`,
   'arcs.connections': (count, plural) =>
     plural === 1 ? `${count} Verknüpfung` : `${count} Verknüpfungen`,
   'arcs.stage':

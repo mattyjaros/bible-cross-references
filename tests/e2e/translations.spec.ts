@@ -99,10 +99,17 @@ test.describe('translations', () => {
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await openPassage(page, 'Ps.23.1');
-    await page.locator(PANEL).getByRole('button', { name: /^Copy/ }).first().click();
-    // Writing to the clipboard is asynchronous, and the panel says so when it has finished:
+    // The verse being read offers to be sent rather than copied; its words are one press
+    // further in, in the sheet that opens, beside the picture of them.
+    await page
+      .locator(PANEL)
+      .getByRole('button', { name: /^Share/ })
+      .click();
+    const sheet = page.locator('dialog[open]');
+    await sheet.getByRole('button', { name: 'Copy text' }).click();
+    // Writing to the clipboard is asynchronous, and the sheet says so when it has finished:
     // reading before that is a race, which is a slow machine away from an empty string.
-    await expect(page.locator(PANEL).getByRole('status').first()).toHaveText(/copied/);
+    await expect(sheet.getByRole('status')).toHaveText(/Copied/);
     const copied = await page.evaluate(() => navigator.clipboard.readText());
     expect(copied).toContain('Psalm 23:1');
     expect(copied).toContain('(BSB)');

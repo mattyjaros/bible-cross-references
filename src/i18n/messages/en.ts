@@ -192,6 +192,18 @@ export const en = {
   'threads.stage':
     'Threads from the verses of this chapter to where their cross-references land in the Bible, ' +
     'shown as a vertical bar of all 66 books.',
+  // Sending a verse to somebody: the card, and the ways of passing it on.
+  'share.verse': (reference: string) => `Share ${reference}`,
+  'share.preview': (reference: string) => `${reference}, drawn as a card`,
+  'share.preparing': 'Drawing the card…',
+  'share.failed': 'The card could not be drawn.',
+  'share.send': 'Share',
+  'share.save': 'Save image',
+  'share.copyText': 'Copy text',
+  'share.copyLink': 'Copy link',
+  'share.copied': 'Copied',
+  'share.crossReferences': (count: string, plural: number) =>
+    plural === 1 ? '1 cross-reference' : `${count} cross-references`,
   'arcs.connections': (count: string, plural: number) =>
     plural === 1 ? `${count} connection` : `${count} connections`,
   'arcs.stage':

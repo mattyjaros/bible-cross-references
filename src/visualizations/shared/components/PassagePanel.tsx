@@ -23,6 +23,7 @@ import {
   OutgoingIcon,
   ReadingIcon,
   PreviousIcon,
+  ShareVerseIcon,
   type IconComponent,
 } from '../../../shared/ui/icons.tsx';
 import type { Translation } from '../../../translations/translation.ts';
@@ -40,6 +41,8 @@ import { GENRE_COLORS, GENRE_HEX } from '../palette.ts';
 import { OriginalWordsSection } from './OriginalWordsSection.tsx';
 import { PanelSection } from './PanelSection.tsx';
 import type { VizData } from '../viz-data.ts';
+import { buildVerseShareRequest } from '../verse-share.ts';
+import { openVerseShare } from './VerseShareDialog.tsx';
 import { useLocalization, type Localization } from '../../../i18n/use-locale.tsx';
 import styles from './PassagePanel.module.css';
 
@@ -187,6 +190,32 @@ function ConnectionText({
 }
 
 /**
+ * Sends the verse on as a picture. It shares the reveal of `CopyQuoteButton` — hover on a
+ * pointer, always but quiet on a touch screen — because it is the same kind of thing in the
+ * same place, and a second way of appearing would be a second thing to learn.
+ */
+function ShareVerseButton({
+  reference,
+  onShare,
+}: {
+  readonly reference: string;
+  readonly onShare: () => void;
+}) {
+  const { t } = useLocalization();
+  return (
+    <button
+      type="button"
+      className={styles.share}
+      aria-label={t('share.verse')(reference)}
+      title={t('share.verse')(reference)}
+      onClick={onShare}
+    >
+      <ShareVerseIcon />
+    </button>
+  );
+}
+
+/**
  * Details of the focused passage: its text, where it connects (by genre) and every connection,
  * grouped by book. Every connection is a button that travels there, so nothing depends on hover.
  */
@@ -200,7 +229,8 @@ export function PassagePanel({
   onPreview,
   shareUrl,
 }: PassagePanelProps) {
-  const { t, books, genreName } = useLocalization();
+  const localization = useLocalization();
+  const { t, books, genreName } = localization;
   const { versification, translation, crossReferences, verseGenres } = data;
   const connections = useMemo(
     () =>
@@ -275,19 +305,23 @@ export function PassagePanel({
               >
                 {verseTextOrNote(translation, passage.verse)}
               </p>
-              <CopyQuoteButton
-                reference={formatPassage(passage, versification, books)}
-                quote={() =>
-                  quotePassage({
-                    translation,
-                    versification,
-                    names: books,
-                    start: passage.verse,
-                    end: passage.verse,
-                    url: shareUrl(passage),
-                  })
-                }
-              />
+              {/* A verse this translation leaves out has nothing to put on a card. */}
+              {translation.verseText(passage.verse) !== '' && (
+                <ShareVerseButton
+                  reference={formatPassage(passage, versification, books)}
+                  onShare={() => {
+                    openVerseShare(
+                      buildVerseShareRequest({
+                        data,
+                        filter,
+                        verse: passage.verse,
+                        url: shareUrl(passage),
+                        localization,
+                      }),
+                    );
+                  }}
+                />
+              )}
             </div>
             {actions && <div className={styles.actions}>{actions}</div>}
           </>

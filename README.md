@@ -55,6 +55,24 @@ fact that they share a word. Acts 5:14 and Luke 5:6, for instance, share πλῆ
 "multitude"), which no cross-reference joins. Words used in more than 100 verses are left out, and
 the text of the verse in its original language is never shown: only the dictionary form.
 
+### Send a verse to somebody
+
+Every verse offers to be shared: on a pointer the button appears when you reach for the line, and
+on a touch screen it sits on the verse you have selected, so a chapter is not thirty invitations
+at once.
+
+What it makes is a picture of the verse — the words, the reference in its book's genre color, and
+underneath them that verse's own cross-references, drawn as arcs over a baseline standing for the
+whole Bible. It is the same link set the Arcs view highlights when you focus a verse, from the
+same `collectConnections`, so the card agrees with the screen it came from. The text's name and
+licence are on it, which using these translations is conditional on.
+
+The card is drawn in the browser, at 1080×1350, when the sheet opens rather than when Share is
+pressed: `navigator.share` has to be called inside the gesture that asked for it, and a canvas
+awaited in between spends the user activation. Where the browser will take a file, Share hands
+the picture to the system sheet; everywhere else the card can be saved, and the verse copied as
+text with its reference and a link.
+
 ### Threads: read with the connections in view
 
 ![Threads: Psalm 23 with threads from each verse to where its cross-references

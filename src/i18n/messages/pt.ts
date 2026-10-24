@@ -178,6 +178,17 @@ export const pt: LocaleMessages = {
   'threads.stage':
     'Fios que vão dos versículos deste capítulo até onde suas referências cruzadas chegam na ' +
     'Bíblia, exibidos como uma barra vertical com todos os 66 livros.',
+  'share.verse': (reference) => `Compartilhar ${reference}`,
+  'share.preview': (reference) => `${reference}, desenhado como um cartão`,
+  'share.preparing': 'Desenhando o cartão…',
+  'share.failed': 'Não foi possível desenhar o cartão.',
+  'share.send': 'Compartilhar',
+  'share.save': 'Salvar imagem',
+  'share.copyText': 'Copiar texto',
+  'share.copyLink': 'Copiar link',
+  'share.copied': 'Copiado',
+  'share.crossReferences': (count, plural) =>
+    plural === 1 ? '1 referência cruzada' : `${count} referências cruzadas`,
   'arcs.connections': (count, plural) => (plural === 1 ? `${count} conexão` : `${count} conexões`),
   'arcs.stage':
     'Diagrama em arcos das referências cruzadas. Arraste ou use as setas para mover, role ou ' +

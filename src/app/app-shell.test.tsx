@@ -66,14 +66,15 @@ afterEach(() => {
 });
 
 describe('mount', () => {
-  it('renders the page into the root, with one install guide beside it', async () => {
+  it('renders the page into the root, with one of each shared dialog beside it', async () => {
     document.body.innerHTML = '<div id="root"></div>';
     await act(async () => {
       mount(<p>Hello</p>);
       await Promise.resolve();
     });
     expect(document.body.textContent).toContain('Hello');
-    expect(document.querySelectorAll('dialog')).toHaveLength(1);
+    // The install guide and the verse share sheet: one of each, however many views.
+    expect(document.querySelectorAll('dialog')).toHaveLength(2);
   });
 
   it('refuses to start without a root to render into', () => {

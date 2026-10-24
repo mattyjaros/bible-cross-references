@@ -24,6 +24,7 @@ import {
   LuRotateCcw,
   LuSearch,
   LuShare,
+  LuShare2,
   LuSlidersHorizontal,
   LuSquarePlus,
   LuX,
@@ -107,6 +108,8 @@ export const SourceCodeIcon = decorative(LuGithub);
 // button wears.
 export const InstallIcon = decorative(LuArrowDownToLine);
 export const ShareIcon = decorative(LuShare);
+/** Sending a verse on, as distinct from `ShareIcon`, which is Safari's own toolbar button. */
+export const ShareVerseIcon = decorative(LuShare2);
 export const BrowserMenuIcon = decorative(LuEllipsisVertical);
 export const AddToHomeScreenIcon = decorative(LuSquarePlus);
 export const AddressBarInstallIcon = decorative(LuMonitorDown);

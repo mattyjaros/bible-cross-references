@@ -230,8 +230,10 @@
   padding-inline-end: 2rem;
 }
 
-/* On the reference's line, clear of the verse text below. */
-.copy {
+/* On the reference's line, clear of the verse text below. Share is the same object in the same
+   place as copy, so it is the same rule: one reveal to learn, and one to maintain. */
+.copy,
+.share {
   position: absolute;
   inset-block-start: 2px;
   inset-inline-end: var(--space-1);
@@ -253,19 +255,23 @@
 }
 
 .quotable:hover .copy,
+.quotable:hover .share,
 .copy:focus-visible,
+.share:focus-visible,
 .copy[data-copied='true'] {
   opacity: 1;
 }
 
 .copy:hover,
+.share:hover,
 .copy[data-copied='true'] {
   color: var(--color-text);
 }
 
 /* No hover on touch screens: always there, but quiet. */
 @media (hover: none) {
-  .copy {
+  .copy,
+  .share {
     border-color: transparent;
     background: none;
     opacity: 0.7;
