@@ -28,34 +28,22 @@ export interface LinkWords {
   readonly evidence: Evidence;
   readonly index: OriginalWordIndex;
   readonly aligner: TranslationAligner;
-  /** Up to this many verses a word is rare enough to list beside a verse; past it, common. */
-  readonly maxVerses: number;
 }
 
 /** What links the two ends of a connection, once the words have arrived; `null` until then. */
 export function useLinkWords(connection: Connection, translation: Translation): LinkWords | null {
-  const words = useOriginalWords();
-  const index = words?.index ?? null;
+  const index = useOriginalWords()?.index ?? null;
   const verseCount = translation.versification.verseCount;
   return useMemo(() => {
-    if (!index || !words) {
+    if (!index) {
       return null;
     }
     return {
       evidence: linkEvidence(index, connection.here, connection.otherStart, connection.otherEnd),
       index,
       aligner: alignerFor(translation, index, verseCount),
-      maxVerses: words.maxVerses,
     };
-  }, [
-    index,
-    words,
-    translation,
-    verseCount,
-    connection.here,
-    connection.otherStart,
-    connection.otherEnd,
-  ]);
+  }, [index, translation, verseCount, connection.here, connection.otherStart, connection.otherEnd]);
 }
 
 /** The original words that make the evidence, on this end of the link and on the other. */
@@ -232,9 +220,6 @@ function firstVerseWith(
   return start;
 }
 
-/** How many of a link's words the badge names before saying how many more there are. */
-const BADGE_WORDS = 2;
-
 /**
  * What links a passage to one of its cross-references, in the original languages: a badge that
  * names the words they share as the reader's translation renders them in the verse being read,
@@ -264,22 +249,15 @@ export function LinkEvidence({
   const named = evidenceWords(evidence).here.map(
     (word) => here.get(word.index)?.text ?? localizedGloss(word, glosses).split(' / ')[0] ?? '',
   );
-  const shown = named.slice(0, BADGE_WORDS).join(', ');
-  const more = named.length > BADGE_WORDS ? ` +${String(named.length - BADGE_WORDS)}` : '';
+  // Every word, as the reader asked: the badge is where a link's shared vocabulary is read at a
+  // glance, and a "+2" hides exactly what it is for.
+  const shown = [...new Set(named)].join(', ');
   const label =
     evidence.kind === 'shared-word'
-      ? t('evidence.sharedWord')(`${shown}${more}`, named.length)
+      ? t('evidence.sharedWord')(shown, named.length)
       : evidence.kind === 'same-meaning'
-        ? t('evidence.sameMeaning')(`${shown}${more}`)
+        ? t('evidence.sameMeaning')(shown)
         : t('evidence.thematic');
-  // A shared word used in a few dozen verses says more than one used in a thousand, and the badge
-  // says so by its weight: the rare word is the strong evidence, the common one a weaker hint.
-  const strength =
-    evidence.kind === 'shared-word'
-      ? (evidence.words[0]?.verseCount ?? 0) <= link.maxVerses
-        ? 'shared-word'
-        : 'shared-common-word'
-      : evidence.kind;
 
   const line = (word: OriginalWord, verse: VerseIndex) => (
     <WordUseLine
@@ -298,7 +276,7 @@ export function LinkEvidence({
     <div className={styles.evidence}>
       <button
         type="button"
-        className={`${styles.evidenceBadge} ${styles[`evidence-${strength}`] ?? ''}`}
+        className={`${styles.evidenceBadge} ${styles[`evidence-${evidence.kind}`] ?? ''}`}
         aria-expanded={open}
         onClick={() => {
           setOpen(!open);

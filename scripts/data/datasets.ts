@@ -148,9 +148,11 @@ const MAX_VERSES_PER_WORD = 100;
 /**
  * Nouns, verbs and adjectives are kept further, for comparing the two ends of a link: "love" and
  * "neighbour" are too common to list beside a verse, but a link that shares them is no mere
- * matter of theme. Past this, a word is "God" or "LORD", which every page shares.
+ * matter of theme. Past this, a word is "God" or "LORD", which every page shares — in both
+ * languages: Greek θεός is in 1,172 verses and Hebrew אֱלֹהִים in 2,088, so a higher cutoff would
+ * keep the one and not the other.
  */
-const MAX_VERSES_PER_CONTENT_WORD = 2000;
+const MAX_VERSES_PER_CONTENT_WORD = 1000;
 
 /** The tagged texts and lexicons, read as `importStepBibleWords` and its companion take them. */
 async function readStepBible(readSource: RawSourceReader) {

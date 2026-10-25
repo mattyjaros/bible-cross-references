@@ -161,7 +161,6 @@ describe('linkMarks', () => {
       evidence: linkEvidence(words.index, here, otherStart, otherStart),
       index: words.index,
       aligner: alignerFor(translation, words.index, CANONICAL_VERSIFICATION.verseCount),
-      maxVerses: 100,
     };
   }
 
