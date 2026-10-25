@@ -55,6 +55,28 @@ fact that they share a word. Acts 5:14 and Luke 5:6, for instance, share πλῆ
 "multitude"), which no cross-reference joins. Words used in more than 100 verses are left out, and
 the text of the verse in its original language is never shown: only the dictionary form.
 
+Each linked passage also says what it shares with the verse being read, in the original
+languages, in a small badge beneath it:
+
+- **shared word** — the same Hebrew or Greek word stands in both, e.g. μονογενής in John 3:16
+  and 1:14. It is a fact about the texts, and the rarer the word the more it says;
+- **same meaning** — no word is shared, but words of each are glossed alike, e.g. אָהַב and
+  ἀγαπάω, "to love", in Leviticus 19:18 and Matthew 22:39. It is the only kind of evidence a link
+  between the Testaments can have, and an approximation;
+- **thematic** — neither, leaving aside grammatical words and the commonest of all (God, LORD).
+  The link rests on the judgement of the Treasury of Scripture Knowledge's editors, and the
+  badge says so.
+
+The badge names the words as the reader's translation renders them, and they are underlined in
+the linked passage. Opening it shows every word, how rare it is, each verse's words around it,
+its grammar, and the English Tyndale's tagging gives it there. No translation the app ships is
+tagged word by word, so which word of the text renders which original word is learned from the
+texts in the browser: a word of the translation found in most verses of a Hebrew or Greek word
+and in few others renders it, each word of a verse going to one original word at most. A weak
+pairing is left unmarked rather than guessed. Comparing two passages keeps nouns, verbs and
+adjectives used in up to 1,000 verses, past the 100 that the word list stops at, so that a link
+sharing "love" and "neighbour" is not called thematic.
+
 ### Send a verse to somebody
 
 Every verse offers to be shared: on a pointer the button appears when you reach for the line, and
