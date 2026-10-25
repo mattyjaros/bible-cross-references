@@ -19,7 +19,7 @@ const INITIAL_WORDS = 6;
  * never opens a verse never pays for it. `null` until it arrives, which is when the section
  * appears; a failed download leaves the panel exactly as it was.
  */
-function useOriginalWords(): OriginalWordsDataset | null {
+export function useOriginalWords(): OriginalWordsDataset | null {
   const [words, setWords] = useState<OriginalWordsDataset | null>(originalWordsIfLoaded);
   useEffect(() => {
     if (words) {
@@ -72,7 +72,9 @@ export function OriginalWordsSection({
   if (!words) {
     return null;
   }
-  const inVerse = words.index.wordsOf(verse);
+  // The index also holds common nouns and verbs, for comparing links; the list beside a verse
+  // keeps to the words rare enough to say something about it.
+  const inVerse = words.index.wordsOf(verse).filter((word) => word.verseCount <= words.maxVerses);
   if (inVerse.length === 0) {
     return null;
   }

@@ -256,6 +256,17 @@ const PINS_READ: Readonly<Record<string, readonly string[]>> = {
     'stepbible-tbesh',
     'stepbible-tbesg',
   ],
+  // The same files again: the occurrences are read from them alongside the words.
+  'data/words/stepbible-occurrences.json': [
+    'stepbible-tahot-gen-deu',
+    'stepbible-tahot-jos-est',
+    'stepbible-tahot-job-sng',
+    'stepbible-tahot-isa-mal',
+    'stepbible-tagnt-mat-jhn',
+    'stepbible-tagnt-act-rev',
+    'stepbible-tbesh',
+    'stepbible-tbesg',
+  ],
 };
 
 describe('DATASET_BUILDERS', () => {
@@ -270,6 +281,7 @@ describe('DATASET_BUILDERS', () => {
       'data/translations/ubg.json',
       'data/cross-references/openbible.json',
       'data/words/stepbible.json',
+      'data/words/stepbible-occurrences.json',
     ]);
   });
 
@@ -393,7 +405,8 @@ describe('the pins and the importers', () => {
     // source added to the pin file that no builder reads — which would sit there pinned,
     // fetched and credited while contributing nothing to the app.
     const sources = await readSources();
-    const declared = Object.values(PINS_READ).flat().toSorted();
+    // Two datasets may be built from the same pins, so each is counted once.
+    const declared = [...new Set(Object.values(PINS_READ).flat())].toSorted();
     expect(declared).toEqual(sources.map((source) => source.id).toSorted());
     expect(Object.keys(PINS_READ).toSorted()).toEqual(
       DATASET_BUILDERS.map((builder) => builder.outputPath).toSorted(),

@@ -176,6 +176,18 @@ export const pl: LocaleMessages = {
     `a ich znaczenia przetłumaczone maszynowo z angielskiego. Słowa występujące w więcej niż ` +
     `${max} wersetach pominięto.`,
   'words.creditLabel': 'Słowa:',
+  'evidence.sharedWord': (lemma) => `wspólne słowo · ${lemma}`,
+  'evidence.sameMeaning': (meaning) => `to samo znaczenie · ${meaning}`,
+  'evidence.thematic': 'tematyczne',
+  'evidence.sharedWord.note':
+    'To samo słowo stoi w obu fragmentach w tekście hebrajskim lub greckim, według oznaczeń STEPBible.',
+  'evidence.sameMeaning.note':
+    'Żadne słowo się nie powtarza, ale te słowa mają w słowniku to samo znaczenie: to podobieństwo znaczenia, nie to samo słowo.',
+  'evidence.thematic.note':
+    'Poza słowami gramatycznymi i najczęstszymi, jak Bóg czy PAN, żadne słowo oryginału nie łączy tych fragmentów. Powiązanie opiera się na ocenie redaktorów Treasury of Scripture Knowledge.',
+  'evidence.verses': (count, plural) =>
+    `w ${count} ${formOf(plural, 'wersecie', 'wersetach', 'wersetach')} Biblii`,
+  'evidence.loading': 'Wczytywanie użycia słów…',
 
   'loading.data': (verses, links) => `Wczytywanie ${verses} wersetów i ${links} odnośników…`,
   'error.datasetUnavailable':

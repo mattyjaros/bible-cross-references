@@ -181,6 +181,18 @@ export const uk: LocaleMessages = {
     `, на основі праці Tyndale House, Кембридж; зведено до словникових форм. Слова, що ` +
     `вживаються більш ніж у ${max} віршах, не включено.`,
   'words.creditLabel': 'Слова:',
+  'evidence.sharedWord': (lemma) => `спільне слово · ${lemma}`,
+  'evidence.sameMeaning': (meaning) => `те саме значення · ${meaning}`,
+  'evidence.thematic': 'тематичне',
+  'evidence.sharedWord.note':
+    'Те саме слово стоїть в обох уривках у єврейському чи грецькому тексті, за розміткою STEPBible.',
+  'evidence.sameMeaning.note':
+    'Жодне слово не повторюється, але ці слова мають у словнику однакове значення: це схожість значення, а не те саме слово.',
+  'evidence.thematic.note':
+    'Крім граматичних і найчастіших слів, як-от Бог і ГОСПОДЬ, жодне слово оригіналу не пов’язує ці уривки. Посилання спирається на судження редакторів Treasury of Scripture Knowledge.',
+  'evidence.verses': (count, plural) =>
+    `у ${count} ${formOf(plural, 'вірші', 'віршах', 'віршах')} Біблії`,
+  'evidence.loading': 'Завантаження вжитку слів…',
 
   'loading.data': (verses, links) =>
     `Завантаження ${verses} віршів і ${links} перехресних посилань…`,

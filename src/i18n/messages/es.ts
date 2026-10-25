@@ -152,6 +152,18 @@ export const es: LocaleMessages = {
     `, a partir del trabajo de Tyndale House, Cambridge; reducido a las formas del ` +
     `diccionario. Las palabras que aparecen en más de ${max} versículos quedan fuera.`,
   'words.creditLabel': 'Palabras:',
+  'evidence.sharedWord': (lemma) => `palabra en común · ${lemma}`,
+  'evidence.sameMeaning': (meaning) => `mismo sentido · ${meaning}`,
+  'evidence.thematic': 'temática',
+  'evidence.sharedWord.note':
+    'La misma palabra aparece en ambos pasajes en hebreo o griego, según el etiquetado de STEPBible.',
+  'evidence.sameMeaning.note':
+    'Ninguna palabra se repite, pero estas tienen la misma glosa en el léxico: una semejanza de sentido, no la misma palabra.',
+  'evidence.thematic.note':
+    'Aparte de las palabras gramaticales y las más comunes, como Dios y SEÑOR, ninguna palabra del original une estos pasajes. La referencia se apoya en el juicio de los editores del Treasury of Scripture Knowledge.',
+  'evidence.verses': (count, plural) =>
+    plural === 1 ? `en ${count} versículo de la Biblia` : `en ${count} versículos de la Biblia`,
+  'evidence.loading': 'Cargando el uso de las palabras…',
 
   'loading.data': (verses, links) =>
     `Cargando ${verses} versículos y ${links} referencias cruzadas…`,

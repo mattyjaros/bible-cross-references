@@ -39,6 +39,7 @@ import type { LinkFilter } from '../link-filter.ts';
 import { canCopy, copyQuote, quotePassage, type PassageQuote } from '../passage-quote.ts';
 import { GENRE_COLORS, GENRE_HEX } from '../palette.ts';
 import { OriginalWordsSection } from './OriginalWordsSection.tsx';
+import { LinkEvidence } from './LinkEvidence.tsx';
 import { PanelSection } from './PanelSection.tsx';
 import type { VizData } from '../viz-data.ts';
 import { buildVerseShareRequest } from '../verse-share.ts';
@@ -626,6 +627,7 @@ function ConnectionSection({
                     })
                   }
                 />
+                <LinkEvidence connection={connection} versification={versification} />
               </div>
             );
           })}

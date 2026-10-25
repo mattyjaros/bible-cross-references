@@ -155,6 +155,18 @@ export const de: LocaleMessages = {
     `, auf Grundlage der Arbeit des Tyndale House, Cambridge; auf die Wörterbuchformen ` +
     `reduziert. Wörter, die in mehr als ${max} Versen vorkommen, bleiben außen vor.`,
   'words.creditLabel': 'Wörter:',
+  'evidence.sharedWord': (lemma) => `gemeinsames Wort · ${lemma}`,
+  'evidence.sameMeaning': (meaning) => `gleiche Bedeutung · ${meaning}`,
+  'evidence.thematic': 'thematisch',
+  'evidence.sharedWord.note':
+    'Dasselbe Wort steht im Hebräischen oder Griechischen in beiden Stellen, nach der Auszeichnung von STEPBible.',
+  'evidence.sameMeaning.note':
+    'Kein Wort ist gemeinsam, aber diese Wörter haben im Lexikon dieselbe Glosse: eine Ähnlichkeit der Bedeutung, nicht dasselbe Wort.',
+  'evidence.thematic.note':
+    'Abgesehen von grammatischen und den allerhäufigsten Wörtern wie Gott und HERR verbindet kein Wort des Urtexts diese Stellen. Der Verweis beruht auf dem Urteil der Herausgeber der Treasury of Scripture Knowledge.',
+  'evidence.verses': (count, plural) =>
+    plural === 1 ? `in ${count} Vers der Bibel` : `in ${count} Versen der Bibel`,
+  'evidence.loading': 'Der Gebrauch der Wörter wird geladen…',
 
   'loading.data': (verses, links) => `${verses} Verse und ${links} Querverweise werden geladen…`,
   'error.datasetUnavailable':

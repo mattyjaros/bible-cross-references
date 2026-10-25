@@ -152,6 +152,18 @@ export const it: LocaleMessages = {
     `, sulla base del lavoro della Tyndale House di Cambridge; ridotto alle forme del ` +
     `dizionario. Le parole che compaiono in più di ${max} versetti sono escluse.`,
   'words.creditLabel': 'Parole:',
+  'evidence.sharedWord': (lemma) => `parola in comune · ${lemma}`,
+  'evidence.sameMeaning': (meaning) => `stesso significato · ${meaning}`,
+  'evidence.thematic': 'tematico',
+  'evidence.sharedWord.note':
+    'La stessa parola compare in entrambi i passi in ebraico o in greco, secondo la marcatura di STEPBible.',
+  'evidence.sameMeaning.note':
+    'Nessuna parola è in comune, ma queste hanno la stessa glossa nel lessico: una somiglianza di significato, non la stessa parola.',
+  'evidence.thematic.note':
+    'A parte le parole grammaticali e le più comuni, come Dio e SIGNORE, nessuna parola dell’originale collega questi passi. Il riferimento si basa sul giudizio dei curatori del Treasury of Scripture Knowledge.',
+  'evidence.verses': (count, plural) =>
+    plural === 1 ? `in ${count} versetto della Bibbia` : `in ${count} versetti della Bibbia`,
+  'evidence.loading': 'Caricamento dell’uso delle parole…',
 
   'loading.data': (verses, links) =>
     `Caricamento di ${verses} versetti e ${links} riferimenti incrociati…`,

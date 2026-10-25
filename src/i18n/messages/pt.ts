@@ -157,6 +157,18 @@ export const pt: LocaleMessages = {
     `, baseado no trabalho da Tyndale House, Cambridge; reduzido às formas de dicionário. ` +
     `Palavras usadas em mais de ${max} versículos ficam de fora.`,
   'words.creditLabel': 'Palavras:',
+  'evidence.sharedWord': (lemma) => `palavra em comum · ${lemma}`,
+  'evidence.sameMeaning': (meaning) => `mesmo sentido · ${meaning}`,
+  'evidence.thematic': 'temática',
+  'evidence.sharedWord.note':
+    'A mesma palavra aparece nas duas passagens em hebraico ou grego, segundo a marcação do STEPBible.',
+  'evidence.sameMeaning.note':
+    'Nenhuma palavra se repete, mas estas têm a mesma glosa no léxico: uma semelhança de sentido, não a mesma palavra.',
+  'evidence.thematic.note':
+    'Fora as palavras gramaticais e as mais comuns, como Deus e SENHOR, nenhuma palavra do original liga estas passagens. A ligação se apoia no juízo dos editores do Treasury of Scripture Knowledge.',
+  'evidence.verses': (count, plural) =>
+    plural === 1 ? `em ${count} versículo da Bíblia` : `em ${count} versículos da Bíblia`,
+  'evidence.loading': 'Carregando o uso das palavras…',
 
   'loading.data': (verses, links) =>
     `Carregando ${verses} versículos e ${links} referências cruzadas…`,

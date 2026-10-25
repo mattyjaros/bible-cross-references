@@ -84,13 +84,22 @@
       "verses": 31102
     }
   },
+  "data/words/stepbible-occurrences.json": {
+    "sha256": "50b0c5ad19a55d9fb7b58831c08fb0cc18cd9bbe29815bba3ee58e2f031bde8d",
+    "bytes": 4222115,
+    "shape": {
+      "grammarCodes": 1632,
+      "untranslated": 0,
+      "verseEntries": 254826
+    }
+  },
   "data/words/stepbible.json": {
-    "sha256": "f372b62acc700a5a62c621888500dcf1d7f7e244f17f9bee43cb3199c56d2e43",
-    "bytes": 1585580,
+    "sha256": "e5e6f9801c71220a64b4e52ca27e7deca68b2e187bfd0b367ab8ed80b31d0070",
+    "bytes": 2339406,
     "shape": {
       "maxVerses": 100,
-      "verseEntries": 124791,
-      "words": 16384
+      "verseEntries": 254826,
+      "words": 16853
     }
   }
 }
