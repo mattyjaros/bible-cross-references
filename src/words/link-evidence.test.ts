@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { OriginalWordColumns } from '../core/datasets/formats.ts';
 import { OriginalWordIndex } from './original-words.ts';
-import { linkEvidence, meaningKey } from './link-evidence.ts';
+import { linkEvidence, meaningKey, meaningKeys } from './link-evidence.ts';
 
 /**
  * Six verses. Verses 0 and 1 share a rare Greek word and a commoner one; verse 2 is Hebrew and
@@ -69,5 +69,12 @@ describe('OriginalWordIndex.entryOf', () => {
 
   it('has no entry for a verse the word is not in', () => {
     expect(index().entryOf(1, 3)).toBeNull();
+  });
+});
+
+describe('meaningKeys', () => {
+  it('offers each alternative of a first sense written with a slash', () => {
+    expect(meaningKeys('near/neighbor')).toEqual(['near/neighbor', 'near', 'neighbor']);
+    expect(meaningKeys('neighbor')).toEqual(['neighbor']);
   });
 });

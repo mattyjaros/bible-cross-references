@@ -30,3 +30,16 @@ describe('loadGlosses', () => {
     expect(await loadGlosses('pl')).toBe(first);
   });
 });
+
+describe('useGlosses', () => {
+  it('has the reader’s table once it has loaded, and none for a language without one', async () => {
+    const { renderHook, waitFor } = await import('@testing-library/react');
+    const { useGlosses } = await import('./glosses.ts');
+    const polish = renderHook(() => useGlosses('pl'));
+    await waitFor(() => {
+      expect(polish.result.current).not.toBeNull();
+    });
+    const german = renderHook(() => useGlosses('de'));
+    expect(german.result.current).toBeNull();
+  });
+});

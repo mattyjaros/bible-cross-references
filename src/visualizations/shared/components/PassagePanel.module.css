@@ -615,3 +615,16 @@
   border-color: var(--color-accent);
   color: var(--color-text);
 }
+
+/* The words a linked passage shares with the verse being read, as its translation renders them. */
+.snippet mark,
+.evidenceExcerpt mark {
+  border-radius: 2px;
+  background: var(--color-accent-soft);
+  color: inherit;
+  box-shadow: inset 0 -1px 0 var(--color-accent);
+}
+
+.evidenceExcerpt {
+  font-family: var(--font-serif);
+}

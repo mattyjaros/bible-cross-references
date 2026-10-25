@@ -40,6 +40,16 @@ export function meaningKey(gloss: string): string {
     .trim();
 }
 
+/**
+ * Every meaning a gloss offers for comparison: a first sense written as alternatives —
+ * `near/neighbor` — offers each, so Greek πλησίον meets Hebrew רֵעַ, glossed `neighbor`.
+ */
+export function meaningKeys(gloss: string): readonly string[] {
+  const whole = meaningKey(gloss);
+  const parts = whole.split('/').map((part) => meaningKey(part));
+  return [...new Set([whole, ...parts])].filter((key) => key !== '');
+}
+
 function wordsOfRange(index: OriginalWordIndex, start: VerseIndex, end: VerseIndex) {
   const words = new Map<number, OriginalWord>();
   for (let verse = start; verse <= end; verse += 1) {
@@ -65,14 +75,17 @@ export function linkEvidence(
   }
   const byMeaning = new Map<string, OriginalWord>();
   for (const word of [...theirs.values()].sort((a, b) => a.verseCount - b.verseCount)) {
-    const key = meaningKey(word.gloss);
-    if (key !== '' && !byMeaning.has(key)) {
-      byMeaning.set(key, word);
+    for (const key of meaningKeys(word.gloss)) {
+      if (!byMeaning.has(key)) {
+        byMeaning.set(key, word);
+      }
     }
   }
   const pairs: MeaningPair[] = [];
   for (const word of ours) {
-    const there = byMeaning.get(meaningKey(word.gloss));
+    const there = meaningKeys(word.gloss)
+      .map((key) => byMeaning.get(key))
+      .find((found) => found !== undefined);
     if (there) {
       pairs.push({ here: word, there });
     }

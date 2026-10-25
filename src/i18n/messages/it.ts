@@ -152,8 +152,9 @@ export const it: LocaleMessages = {
     `, sulla base del lavoro della Tyndale House di Cambridge; ridotto alle forme del ` +
     `dizionario. Le parole che compaiono in più di ${max} versetti sono escluse.`,
   'words.creditLabel': 'Parole:',
-  'evidence.sharedWord': (lemma) => `parola in comune · ${lemma}`,
-  'evidence.sameMeaning': (meaning) => `stesso significato · ${meaning}`,
+  'evidence.sharedWord': (words, count) =>
+    count === 1 ? `parola in comune · ${words}` : `parole in comune · ${words}`,
+  'evidence.sameMeaning': (words) => `stesso significato · ${words}`,
   'evidence.thematic': 'tematico',
   'evidence.sharedWord.note':
     'La stessa parola compare in entrambi i passi in ebraico o in greco, secondo la marcatura di STEPBible.',

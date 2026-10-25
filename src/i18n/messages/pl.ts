@@ -176,8 +176,9 @@ export const pl: LocaleMessages = {
     `a ich znaczenia przetłumaczone maszynowo z angielskiego. Słowa występujące w więcej niż ` +
     `${max} wersetach pominięto.`,
   'words.creditLabel': 'Słowa:',
-  'evidence.sharedWord': (lemma) => `wspólne słowo · ${lemma}`,
-  'evidence.sameMeaning': (meaning) => `to samo znaczenie · ${meaning}`,
+  'evidence.sharedWord': (words, count) =>
+    count === 1 ? `wspólne słowo · ${words}` : `wspólne słowa · ${words}`,
+  'evidence.sameMeaning': (words) => `to samo znaczenie · ${words}`,
   'evidence.thematic': 'tematyczne',
   'evidence.sharedWord.note':
     'To samo słowo stoi w obu fragmentach w tekście hebrajskim lub greckim, według oznaczeń STEPBible.',

@@ -155,8 +155,9 @@ export const de: LocaleMessages = {
     `, auf Grundlage der Arbeit des Tyndale House, Cambridge; auf die Wörterbuchformen ` +
     `reduziert. Wörter, die in mehr als ${max} Versen vorkommen, bleiben außen vor.`,
   'words.creditLabel': 'Wörter:',
-  'evidence.sharedWord': (lemma) => `gemeinsames Wort · ${lemma}`,
-  'evidence.sameMeaning': (meaning) => `gleiche Bedeutung · ${meaning}`,
+  'evidence.sharedWord': (words, count) =>
+    count === 1 ? `gemeinsames Wort · ${words}` : `gemeinsame Wörter · ${words}`,
+  'evidence.sameMeaning': (words) => `gleiche Bedeutung · ${words}`,
   'evidence.thematic': 'thematisch',
   'evidence.sharedWord.note':
     'Dasselbe Wort steht im Hebräischen oder Griechischen in beiden Stellen, nach der Auszeichnung von STEPBible.',

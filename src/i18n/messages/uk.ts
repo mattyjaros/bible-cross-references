@@ -181,8 +181,9 @@ export const uk: LocaleMessages = {
     `, на основі праці Tyndale House, Кембридж; зведено до словникових форм. Слова, що ` +
     `вживаються більш ніж у ${max} віршах, не включено.`,
   'words.creditLabel': 'Слова:',
-  'evidence.sharedWord': (lemma) => `спільне слово · ${lemma}`,
-  'evidence.sameMeaning': (meaning) => `те саме значення · ${meaning}`,
+  'evidence.sharedWord': (words, count) =>
+    count === 1 ? `спільне слово · ${words}` : `спільні слова · ${words}`,
+  'evidence.sameMeaning': (words) => `те саме значення · ${words}`,
   'evidence.thematic': 'тематичне',
   'evidence.sharedWord.note':
     'Те саме слово стоїть в обох уривках у єврейському чи грецькому тексті, за розміткою STEPBible.',

@@ -167,8 +167,9 @@ export const en = {
     `, based on work at Tyndale House, Cambridge; reduced to dictionary forms. Words used in ` +
     `more than ${max} verses are left out.`,
   'words.creditLabel': 'Words:',
-  'evidence.sharedWord': (lemma: string) => `shared word · ${lemma}`,
-  'evidence.sameMeaning': (meaning: string) => `same meaning · ${meaning}`,
+  'evidence.sharedWord': (words: string, count: number) =>
+    count === 1 ? `shared word · ${words}` : `shared words · ${words}`,
+  'evidence.sameMeaning': (words: string) => `same meaning · ${words}`,
   'evidence.thematic': 'thematic',
   'evidence.sharedWord.note':
     'The same word stands in both passages in the Hebrew or Greek, as STEPBible tags it.',

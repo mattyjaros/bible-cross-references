@@ -1,21 +1,119 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { formatVerseRef } from '../../../core/bible/reference-format.ts';
 import type { VerseIndex } from '../../../core/bible/verse-ref.ts';
 import type { Versification } from '../../../core/bible/versification.ts';
 import { useLocalization } from '../../../i18n/use-locale.tsx';
 import { ExpandIcon } from '../../../shared/ui/icons.tsx';
+import type { Translation } from '../../../translations/translation.ts';
 import { localizedGloss, useGlosses, type GlossTable } from '../../../words/glosses.ts';
 import { describeGrammar } from '../../../words/grammar.ts';
-import { linkEvidence } from '../../../words/link-evidence.ts';
+import { linkEvidence, type LinkEvidence as Evidence } from '../../../words/link-evidence.ts';
 import type { WordOccurrences } from '../../../words/load-word-occurrences.ts';
 import type { OriginalWord, OriginalWordIndex } from '../../../words/original-words.ts';
+import {
+  alignerFor,
+  type AlignedSpan,
+  type TranslationAligner,
+} from '../../../words/translation-alignment.ts';
 import type { Connection } from '../connections.ts';
 import { wordOccurrencesLoader } from '../viz-data.ts';
 import { useOriginalWords } from './OriginalWordsSection.tsx';
 import styles from './PassagePanel.module.css';
 
-/** More shared words than this are a list nobody reads; the rarest say the most. */
-const MAX_WORDS = 3;
+/** How many words of the verse to show either side of a marked one. */
+const CONTEXT_WORDS = 6;
+
+/** The words on each side of a link, compared, with the translation's own words for them. */
+export interface LinkWords {
+  readonly evidence: Evidence;
+  readonly index: OriginalWordIndex;
+  readonly aligner: TranslationAligner;
+  /** Up to this many verses a word is rare enough to list beside a verse; past it, common. */
+  readonly maxVerses: number;
+}
+
+/** What links the two ends of a connection, once the words have arrived; `null` until then. */
+export function useLinkWords(connection: Connection, translation: Translation): LinkWords | null {
+  const words = useOriginalWords();
+  const index = words?.index ?? null;
+  const verseCount = translation.versification.verseCount;
+  return useMemo(() => {
+    if (!index || !words) {
+      return null;
+    }
+    return {
+      evidence: linkEvidence(index, connection.here, connection.otherStart, connection.otherEnd),
+      index,
+      aligner: alignerFor(translation, index, verseCount),
+      maxVerses: words.maxVerses,
+    };
+  }, [
+    index,
+    words,
+    translation,
+    verseCount,
+    connection.here,
+    connection.otherStart,
+    connection.otherEnd,
+  ]);
+}
+
+/** The original words that make the evidence, on this end of the link and on the other. */
+function evidenceWords(evidence: Evidence): {
+  readonly here: readonly OriginalWord[];
+  readonly there: readonly OriginalWord[];
+} {
+  if (evidence.kind === 'shared-word') {
+    return { here: evidence.words, there: evidence.words };
+  }
+  if (evidence.kind === 'same-meaning') {
+    return {
+      here: evidence.pairs.map((pair) => pair.here),
+      there: evidence.pairs.map((pair) => pair.there),
+    };
+  }
+  return { here: [], there: [] };
+}
+
+/** Where the words linking a passage to the verse being read stand in one of its verses. */
+export function linkMarks(link: LinkWords, verse: VerseIndex): readonly AlignedSpan[] {
+  const wanted = new Set(evidenceWords(link.evidence).there.map((word) => word.index));
+  return [...link.aligner.align(verse)]
+    .filter(([word]) => wanted.has(word))
+    .map(([, span]) => span);
+}
+
+/** A verse's text with some of its words marked. */
+export function markedText(text: string, spans: readonly AlignedSpan[]): ReactNode {
+  if (spans.length === 0) {
+    return text;
+  }
+  const pieces: ReactNode[] = [];
+  let at = 0;
+  for (const span of [...spans].sort((a, b) => a.start - b.start)) {
+    pieces.push(text.slice(at, span.start), <mark key={span.start}>{span.text}</mark>);
+    at = span.end;
+  }
+  pieces.push(text.slice(at));
+  return pieces.map((piece, position) => <Fragment key={position}>{piece}</Fragment>);
+}
+
+/** The few words around a marked one: enough to read it in its sentence, short enough to scan. */
+function excerpt(text: string, span: AlignedSpan): ReactNode {
+  const before = text.slice(0, span.start).split(/\s+/);
+  const after = text.slice(span.end).split(/\s+/);
+  const head = before.slice(-CONTEXT_WORDS - 1).join(' ');
+  const tail = after.slice(0, CONTEXT_WORDS + 1).join(' ');
+  return (
+    <>
+      {before.length > CONTEXT_WORDS + 1 && '…'}
+      {head}
+      <mark>{span.text}</mark>
+      {tail}
+      {after.length > CONTEXT_WORDS + 1 && '…'}
+    </>
+  );
+}
 
 /** The occurrences, fetched the first time a reader opens any link's evidence. */
 function useWordOccurrences(wanted: boolean): WordOccurrences | null {
@@ -47,35 +145,47 @@ function scriptOf(word: OriginalWord): { readonly lang: string; readonly dir: 'r
   return word.strongs.startsWith('H') ? { lang: 'he', dir: 'rtl' } : { lang: 'el', dir: 'ltr' };
 }
 
-/** How a word is used in one verse: where, the English it is given there, and its grammar. */
+/**
+ * How a word is used in one verse: the verse's own words around the translation's word for it,
+ * then its grammar and the English the tagging gives it.
+ */
 function WordUseLine({
   word,
   verse,
-  index,
+  link,
+  translation,
   occurrences,
   versification,
 }: {
   readonly word: OriginalWord;
   readonly verse: VerseIndex;
-  readonly index: OriginalWordIndex;
+  readonly link: LinkWords;
+  readonly translation: Translation;
   readonly occurrences: WordOccurrences | null;
   readonly versification: Versification;
 }) {
   const { t, books, locale } = useLocalization();
-  const entry = index.entryOf(word.index, verse);
+  const entry = link.index.entryOf(word.index, verse);
   const use = occurrences && entry !== null ? occurrences.useAt(entry) : null;
+  const span = link.aligner.align(verse).get(word.index);
   return (
     <div className={styles.evidenceUse}>
       <span className={styles.evidenceUseRef}>
         {formatVerseRef(versification.refAt(verse), books)}
       </span>
+      {span && (
+        <span
+          className={styles.evidenceExcerpt}
+          lang={translation.manifest.language}
+          dir={translation.manifest.direction}
+        >
+          {excerpt(translation.verseText(verse), span)}
+        </span>
+      )}
       {use ? (
-        <>
-          <span className={styles.evidenceEnglish} lang="en">
-            {use.english}
-          </span>
-          <span className={styles.muted}>{describeGrammar(use.grammar, locale.id)}</span>
-        </>
+        <span className={styles.muted}>
+          {describeGrammar(use.grammar, locale.id)} · <span lang="en">{use.english}</span>
+        </span>
       ) : (
         <span className={styles.muted}>{t('evidence.loading')}</span>
       )}
@@ -122,56 +232,67 @@ function firstVerseWith(
   return start;
 }
 
+/** How many of a link's words the badge names before saying how many more there are. */
+const BADGE_WORDS = 2;
+
 /**
  * What links a passage to one of its cross-references, in the original languages: a badge that
- * says what kind of link it is, opening on what the two passages share. Worked out when the
- * badge is drawn, from words that are already loaded; how each word is used is fetched only when
- * a reader opens one.
+ * names the words they share as the reader's translation renders them in the verse being read,
+ * opening on every one of those words — each in its own verse, with its grammar.
  */
 export function LinkEvidence({
   connection,
+  link,
+  translation,
   versification,
 }: {
   readonly connection: Connection;
+  readonly link: LinkWords | null;
+  readonly translation: Translation;
   readonly versification: Versification;
 }) {
   const { t, locale } = useLocalization();
-  const words = useOriginalWords();
   const glosses = useGlosses(locale.id);
   const [open, setOpen] = useState(false);
   const occurrences = useWordOccurrences(open);
-  const index = words?.index ?? null;
-  const evidence = useMemo(
-    () =>
-      index
-        ? linkEvidence(index, connection.here, connection.otherStart, connection.otherEnd)
-        : null,
-    [index, connection.here, connection.otherStart, connection.otherEnd],
-  );
-  if (!index || !evidence) {
+  if (!link) {
     return null;
   }
-
+  const { evidence, index, aligner } = link;
+  const here = aligner.align(connection.here);
+  // The translation's own word where it could be found, the gloss where it could not.
+  const named = evidenceWords(evidence).here.map(
+    (word) => here.get(word.index)?.text ?? localizedGloss(word, glosses).split(' / ')[0] ?? '',
+  );
+  const shown = named.slice(0, BADGE_WORDS).join(', ');
+  const more = named.length > BADGE_WORDS ? ` +${String(named.length - BADGE_WORDS)}` : '';
   const label =
     evidence.kind === 'shared-word'
-      ? t('evidence.sharedWord')(evidence.words[0]?.lemma ?? '')
+      ? t('evidence.sharedWord')(`${shown}${more}`, named.length)
       : evidence.kind === 'same-meaning'
-        ? t('evidence.sameMeaning')(
-            // The first sense is the one the words were matched on.
-            localizedGloss(evidence.pairs[0]?.here ?? { strongs: '', gloss: '' }, glosses).split(
-              ' / ',
-            )[0] ?? '',
-          )
+        ? t('evidence.sameMeaning')(`${shown}${more}`)
         : t('evidence.thematic');
-
   // A shared word used in a few dozen verses says more than one used in a thousand, and the badge
   // says so by its weight: the rare word is the strong evidence, the common one a weaker hint.
   const strength =
     evidence.kind === 'shared-word'
-      ? (evidence.words[0]?.verseCount ?? 0) <= (words?.maxVerses ?? 0)
+      ? (evidence.words[0]?.verseCount ?? 0) <= link.maxVerses
         ? 'shared-word'
         : 'shared-common-word'
       : evidence.kind;
+
+  const line = (word: OriginalWord, verse: VerseIndex) => (
+    <WordUseLine
+      word={word}
+      verse={verse}
+      link={link}
+      translation={translation}
+      occurrences={occurrences}
+      versification={versification}
+    />
+  );
+  const there = (word: OriginalWord) =>
+    firstVerseWith(word, index, connection.otherStart, connection.otherEnd);
 
   return (
     <div className={styles.evidence}>
@@ -191,23 +312,11 @@ export function LinkEvidence({
           {evidence.kind === 'shared-word' && (
             <>
               <p className={styles.muted}>{t('evidence.sharedWord.note')}</p>
-              {evidence.words.slice(0, MAX_WORDS).map((word) => (
+              {evidence.words.map((word) => (
                 <div key={word.strongs} className={styles.evidenceItem}>
                   <WordHeading word={word} glosses={glosses} />
-                  <WordUseLine
-                    word={word}
-                    verse={connection.here}
-                    index={index}
-                    occurrences={occurrences}
-                    versification={versification}
-                  />
-                  <WordUseLine
-                    word={word}
-                    verse={firstVerseWith(word, index, connection.otherStart, connection.otherEnd)}
-                    index={index}
-                    occurrences={occurrences}
-                    versification={versification}
-                  />
+                  {line(word, connection.here)}
+                  {line(word, there(word))}
                 </div>
               ))}
             </>
@@ -215,24 +324,12 @@ export function LinkEvidence({
           {evidence.kind === 'same-meaning' && (
             <>
               <p className={styles.muted}>{t('evidence.sameMeaning.note')}</p>
-              {evidence.pairs.slice(0, MAX_WORDS).map(({ here, there }) => (
-                <div key={`${here.strongs}-${there.strongs}`} className={styles.evidenceItem}>
-                  <WordHeading word={here} glosses={glosses} />
-                  <WordUseLine
-                    word={here}
-                    verse={connection.here}
-                    index={index}
-                    occurrences={occurrences}
-                    versification={versification}
-                  />
-                  <WordHeading word={there} glosses={glosses} />
-                  <WordUseLine
-                    word={there}
-                    verse={firstVerseWith(there, index, connection.otherStart, connection.otherEnd)}
-                    index={index}
-                    occurrences={occurrences}
-                    versification={versification}
-                  />
+              {evidence.pairs.map(({ here: ours, there: theirs }) => (
+                <div key={`${ours.strongs}-${theirs.strongs}`} className={styles.evidenceItem}>
+                  <WordHeading word={ours} glosses={glosses} />
+                  {line(ours, connection.here)}
+                  <WordHeading word={theirs} glosses={glosses} />
+                  {line(theirs, there(theirs))}
                 </div>
               ))}
             </>

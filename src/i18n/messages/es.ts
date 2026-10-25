@@ -152,8 +152,9 @@ export const es: LocaleMessages = {
     `, a partir del trabajo de Tyndale House, Cambridge; reducido a las formas del ` +
     `diccionario. Las palabras que aparecen en más de ${max} versículos quedan fuera.`,
   'words.creditLabel': 'Palabras:',
-  'evidence.sharedWord': (lemma) => `palabra en común · ${lemma}`,
-  'evidence.sameMeaning': (meaning) => `mismo sentido · ${meaning}`,
+  'evidence.sharedWord': (words, count) =>
+    count === 1 ? `palabra en común · ${words}` : `palabras en común · ${words}`,
+  'evidence.sameMeaning': (words) => `mismo sentido · ${words}`,
   'evidence.thematic': 'temática',
   'evidence.sharedWord.note':
     'La misma palabra aparece en ambos pasajes en hebreo o griego, según el etiquetado de STEPBible.',
