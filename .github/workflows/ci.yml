@@ -51,6 +51,8 @@ jobs:
           path: data/raw
           key: raw-data-${{ hashFiles('data/sources.json') }}
       - run: npm run build
+        env:
+          SITE_ORIGIN: https://mattyjaros.github.io
       # `npm run build` rewrites data/datasets.lock.json from whatever it just produced. If that
       # differs from what is committed, the generated scripture differs too — and since
       # public/data is not in the repository, this file is the only place a reviewer would see
@@ -189,8 +191,8 @@ jobs:
             test-results
           retention-days: 7
 
-  # Publishes main to trekhleb.dev/bible-cross-references/, once every check has passed. The domain
-  # comes from the owner's user site; builds already use the /bible-cross-references/ base path.
+  # Publishes main to mattyjaros.github.io/bible-cross-references/, once every check has passed.
+  # Builds already use the /bible-cross-references/ base path.
   deploy:
     name: Deploy to GitHub Pages
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
