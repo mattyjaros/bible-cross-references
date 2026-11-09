@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { OriginalWordColumns } from '../core/datasets/formats.ts';
 import { OriginalWordIndex } from './original-words.ts';
-import { linkEvidence, meaningKey, meaningKeys } from './link-evidence.ts';
+import { dictionaryWord, linkEvidence, meaningKey, meaningKeys } from './link-evidence.ts';
 
 /**
  * Six verses. Verses 0 and 1 share a rare Greek word and a commoner one; verse 2 is Hebrew and
@@ -25,7 +25,8 @@ describe('linkEvidence', () => {
     const evidence = linkEvidence(index(), 0, 1, 1);
     expect(evidence.kind).toBe('shared-word');
     if (evidence.kind === 'shared-word') {
-      expect(evidence.words.map((word) => word.strongs)).toEqual(['G0001', 'G0002']);
+      expect(evidence.pairs.map(({ here }) => here.strongs)).toEqual(['G0001', 'G0002']);
+      expect(evidence.alike).toEqual([]);
     }
   });
 
@@ -39,6 +40,33 @@ describe('linkEvidence', () => {
     if (evidence.kind === 'same-meaning') {
       expect(evidence.pairs.map(({ here, there }) => [here.strongs, there.strongs])).toEqual([
         ['H7965', 'G1515'],
+      ]);
+    }
+  });
+
+  it('shares a word whose two verses use it in different senses', () => {
+    // דֶּרֶךְ as "way / conduct" in verse 0 and "way / road" in verse 1, and "to know" in both
+    // under one number; verse 0 also says "father", which verse 1 says with another word.
+    const senses = new OriginalWordIndex(
+      {
+        strongs: ['H1870G', 'H1870K', 'H3045', 'H0001', 'H0002'],
+        lemma: ['דֶּרֶךְ', 'דֶּרֶךְ', 'יָדַע', 'אָב', 'אַבָּא'],
+        transliteration: ['derekh', 'derekh', 'yada', 'av', 'abba'],
+        gloss: ['way / conduct', 'way / road', 'to know', 'father', 'father'],
+        offsets: [0, 1, 2, 4, 5, 6],
+        verses: [0, 1, 0, 1, 0, 1],
+      },
+      2,
+    );
+    const evidence = linkEvidence(senses, 0, 1, 1);
+    expect(evidence.kind).toBe('shared-word');
+    if (evidence.kind === 'shared-word') {
+      expect(evidence.pairs.map(({ here, there }) => [here.strongs, there.strongs])).toEqual([
+        ['H1870G', 'H1870K'],
+        ['H3045', 'H3045'],
+      ]);
+      expect(evidence.alike.map(({ here, there }) => [here.strongs, there.strongs])).toEqual([
+        ['H0001', 'H0002'],
       ]);
     }
   });
@@ -76,5 +104,13 @@ describe('meaningKeys', () => {
   it('offers each alternative of a first sense written with a slash', () => {
     expect(meaningKeys('near/neighbor')).toEqual(['near/neighbor', 'near', 'neighbor']);
     expect(meaningKeys('neighbor')).toEqual(['neighbor']);
+  });
+});
+
+describe('dictionaryWord', () => {
+  it('drops the letter that names a sense', () => {
+    expect(dictionaryWord('H1870G')).toBe('H1870');
+    expect(dictionaryWord('G0025')).toBe('G0025');
+    expect(dictionaryWord('unknown')).toBe('unknown');
   });
 });

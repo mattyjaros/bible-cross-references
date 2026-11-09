@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { versePassage, type Passage } from '../../../core/bible/passage.ts';
@@ -62,11 +62,15 @@ describe('PassagePanel', () => {
     expect(screen.getByText(/In the beginning/)).toBeDefined();
   });
 
-  it('follows a reference when it is chosen', async () => {
+  it('opens a reference in its context, and follows it from there', async () => {
     const { onSelect } = renderPanel();
     await userEvent.click(
       screen.getByText(/But God proves His love/).closest('button') as HTMLElement,
     );
+    expect(onSelect).not.toHaveBeenCalled();
+    const context = screen.getByRole('dialog', { name: 'Romans 5:8' });
+    expect(within(context).getByText('Chapter 5')).toBeDefined();
+    await userEvent.click(within(context).getByRole('button', { name: 'Go to this passage' }));
     expect(onSelect).toHaveBeenCalledWith(versePassage(ROM_5_8));
   });
 

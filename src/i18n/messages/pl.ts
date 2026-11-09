@@ -190,6 +190,23 @@ export const pl: LocaleMessages = {
     `w ${count} ${formOf(plural, 'wersecie', 'wersetach', 'wersetach')} Biblii`,
   'evidence.loading': 'Wczytywanie użycia słów…',
 
+  'context.earlier': 'Wcześniejsze wersety',
+  'context.later': 'Dalsze wersety',
+  'context.open': 'Przejdź do tego fragmentu',
+  'context.chapter': (chapter) => `Rozdział ${chapter}`,
+
+  'linkFilter.title': 'Filtruj powiązania',
+  'linkFilter.note': 'według słowa lub rodzaju',
+  'linkFilter.words': 'Słowa tego wersetu',
+  'linkFilter.wordsNote': 'to samo słowo hebrajskie lub greckie albo słowo o tym samym znaczeniu',
+  'linkFilter.kinds': 'Rodzaj powiązania',
+  'linkFilter.sharedWord': 'wspólne słowo',
+  'linkFilter.sameMeaning': 'to samo znaczenie',
+  'linkFilter.shown': (shown, total, plural) =>
+    `${shown} z ${total} ${plural === 1 ? 'powiązanego fragmentu' : 'powiązanych fragmentów'}`,
+  'linkFilter.clear': 'Wyczyść',
+  'linkFilter.none': 'Żaden powiązany fragment nie pasuje.',
+
   'loading.data': (verses, links) => `Wczytywanie ${verses} wersetów i ${links} odnośników…`,
   'error.datasetUnavailable':
     'Nie udało się wczytać tej części danych biblijnych. Sprawdź połączenie i spróbuj ponownie.',

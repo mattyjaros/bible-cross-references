@@ -20,6 +20,8 @@ interface ArcsStageProps {
   readonly focus: Passage | null;
   /** A connection pointed at in the details panel: its arc and its whole passage stand out. */
   readonly preview: Connection | null;
+  /** The focused passage's links the reader narrowed it to: these stand out, the rest fade. */
+  readonly highlight: readonly Connection[] | null;
   readonly onSelect: (passage: Passage | null) => void;
 }
 
@@ -31,6 +33,7 @@ export function ArcsStage({
   filter,
   focus,
   preview,
+  highlight,
   onSelect,
 }: ArcsStageProps) {
   const { t, books, locale } = useLocalization();
@@ -111,21 +114,28 @@ export function ArcsStage({
     controllerRef.current?.setFocus(focus && passageRange(focus, data.versification));
   }, [focus, data.versification]);
 
+  // One link pointed at wins over the narrowed set, which comes back when it is let go.
   useEffect(() => {
     const link = preview?.link;
+    const { index } = data.crossReferences;
     controllerRef.current?.setPreview(
       link
         ? {
-            links: buildArcInstances(
-              data.crossReferences.index,
-              Int32Array.of(link.id),
-              data.verseGenres,
-            ),
+            links: buildArcInstances(index, Int32Array.of(link.id), data.verseGenres),
             passage: { start: link.targetStart, end: link.targetEnd },
           }
-        : null,
+        : highlight
+          ? {
+              links: buildArcInstances(
+                index,
+                Int32Array.from(new Set(highlight.map((connection) => connection.link.id))),
+                data.verseGenres,
+              ),
+              passage: null,
+            }
+          : null,
     );
-  }, [preview, data]);
+  }, [preview, highlight, data]);
 
   return (
     <div

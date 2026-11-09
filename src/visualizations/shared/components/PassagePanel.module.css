@@ -631,3 +631,90 @@
 .evidenceExcerpt {
   font-family: var(--font-serif);
 }
+
+/* Narrowing a verse's links by word or kind. The choices are chips that wrap, like the words
+   they name; checked, they take the accent's border, as the shared-word badge does. */
+.filterTally {
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.filterSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.filterClear {
+  padding: 0.125rem var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.filterClear:hover,
+.filterClear:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.filterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: 0;
+}
+
+.filterLegend {
+  margin-block-end: var(--space-1);
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.filterOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem 0.625rem 0.1875rem 0.375rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.filterOption:hover {
+  color: var(--color-text);
+}
+
+.filterOption:has(input:checked) {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.filterOption:has(input:disabled) {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.filterOption input {
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.filterOriginal {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}

@@ -181,6 +181,23 @@ export const en = {
     plural === 1 ? `in ${count} verse of the Bible` : `in ${count} verses of the Bible`,
   'evidence.loading': 'Loading how the words are used…',
 
+  'context.earlier': 'Earlier verses',
+  'context.later': 'Later verses',
+  'context.open': 'Go to this passage',
+  'context.chapter': (chapter: string) => `Chapter ${chapter}`,
+
+  'linkFilter.title': 'Filter links',
+  'linkFilter.note': 'by word or kind',
+  'linkFilter.words': 'Words of this verse',
+  'linkFilter.wordsNote': 'the same Hebrew or Greek word, or one that means the same',
+  'linkFilter.kinds': 'Kind of link',
+  'linkFilter.sharedWord': 'shared word',
+  'linkFilter.sameMeaning': 'same meaning',
+  'linkFilter.shown': (shown: string, total: string, plural: number) =>
+    `${shown} of ${total} linked ${plural === 1 ? 'passage' : 'passages'}`,
+  'linkFilter.clear': 'Clear',
+  'linkFilter.none': 'No linked passage matches.',
+
   'loading.data': (verses: string, links: string) =>
     `Loading ${verses} verses and ${links} cross-references…`,
   // What a reader meets when a dataset will not load: almost always the network, and almost

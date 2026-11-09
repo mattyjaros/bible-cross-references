@@ -83,6 +83,12 @@ export function ThreadsExplorer({
     readonly connection: Connection;
   } | null>(null);
   const previewed = preview?.passage === passage ? preview.connection : null;
+  // The links the reader narrowed the panel to, likewise.
+  const [highlight, setHighlight] = useState<{
+    readonly passage: Passage;
+    readonly connections: readonly Connection[];
+  } | null>(null);
+  const highlighted = highlight?.passage === passage ? highlight.connections : null;
 
   return (
     <VizPage
@@ -128,6 +134,9 @@ export function ThreadsExplorer({
             onPreview={(connection) => {
               setPreview(connection && passage && { passage, connection });
             }}
+            onHighlight={(connections) => {
+              setHighlight(connections && passage && { passage, connections });
+            }}
           />
         )
       }
@@ -140,6 +149,7 @@ export function ThreadsExplorer({
         filter={filter}
         direction={direction}
         preview={previewed}
+        highlight={highlighted}
         onSelect={onNavigate}
         shareUrl={shareUrl}
       />

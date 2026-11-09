@@ -169,6 +169,24 @@ export const de: LocaleMessages = {
     plural === 1 ? `in ${count} Vers der Bibel` : `in ${count} Versen der Bibel`,
   'evidence.loading': 'Der Gebrauch der Wörter wird geladen…',
 
+  'context.earlier': 'Frühere Verse',
+  'context.later': 'Spätere Verse',
+  'context.open': 'Zu dieser Stelle gehen',
+  'context.chapter': (chapter) => `Kapitel ${chapter}`,
+
+  'linkFilter.title': 'Verknüpfungen filtern',
+  'linkFilter.note': 'nach Wort oder Art',
+  'linkFilter.words': 'Wörter dieses Verses',
+  'linkFilter.wordsNote':
+    'dasselbe hebräische oder griechische Wort oder eines mit derselben Bedeutung',
+  'linkFilter.kinds': 'Art der Verknüpfung',
+  'linkFilter.sharedWord': 'gemeinsames Wort',
+  'linkFilter.sameMeaning': 'gleiche Bedeutung',
+  'linkFilter.shown': (shown, total, plural) =>
+    `${shown} von ${total} verknüpften ${plural === 1 ? 'Stelle' : 'Stellen'}`,
+  'linkFilter.clear': 'Zurücksetzen',
+  'linkFilter.none': 'Keine verknüpfte Stelle passt.',
+
   'loading.data': (verses, links) => `${verses} Verse und ${links} Querverweise werden geladen…`,
   'error.datasetUnavailable':
     'Dieser Teil der Bibeldaten konnte nicht geladen werden. Prüfen Sie Ihre Verbindung und ' +

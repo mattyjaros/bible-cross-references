@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react';
 import { GENRES, getBookGenre } from '../../../core/bible/genres.ts';
 import {
   chapterPassageOf,
@@ -39,8 +39,17 @@ import {
 import type { LinkFilter } from '../link-filter.ts';
 import { canCopy, copyQuote, quotePassage, type PassageQuote } from '../passage-quote.ts';
 import { GENRE_COLORS, GENRE_HEX } from '../palette.ts';
-import { OriginalWordsSection } from './OriginalWordsSection.tsx';
+import { OriginalWordsSection, useOriginalWords } from './OriginalWordsSection.tsx';
+import { ConnectionFilter } from './ConnectionFilter.tsx';
+import {
+  connectionWords,
+  isSelected,
+  isSelecting,
+  NO_SELECTION,
+  type ConnectionSelection,
+} from '../connection-selection.ts';
 import { LinkEvidence, linkMarks, markedText, useLinkWords } from './LinkEvidence.tsx';
+import { PassageContext } from './PassageContext.tsx';
 import { PanelSection } from './PanelSection.tsx';
 import type { VizData } from '../viz-data.ts';
 import { buildVerseShareRequest } from '../verse-share.ts';
@@ -61,6 +70,11 @@ interface PassagePanelProps {
    * can show that one link, and the whole passage it points to.
    */
   readonly onPreview?: (connection: Connection | null) => void;
+  /**
+   * The reader has narrowed the links to some of them, or no longer has (`null`): the
+   * visualization can show those and fade the rest.
+   */
+  readonly onHighlight?: (connections: readonly Connection[] | null) => void;
   /** A passage's address on the published site, for copied quotes. */
   readonly shareUrl: (passage: Passage) => string;
 }
@@ -237,27 +251,68 @@ export function PassagePanel({
   onSelect,
   onClose,
   onPreview,
+  onHighlight,
   shareUrl,
 }: PassagePanelProps) {
   const localization = useLocalization();
   const { t, books, genreName } = localization;
   const { versification, translation, crossReferences, verseGenres } = data;
+  const range = passageRange(passage, versification);
+  // By the range rather than the passage: a view may hand in an equal passage on every render,
+  // and the links narrowed from these are reported back to it.
   const connections = useMemo(
     () =>
       collectConnections(
         crossReferences.index,
-        passageRange(passage, versification),
+        { start: range.start, end: range.end },
         filter,
         verseGenres,
       ),
-    [crossReferences.index, passage, versification, filter, verseGenres],
+    [crossReferences.index, range.start, range.end, filter, verseGenres],
   );
-  const range = passageRange(passage, versification);
   const book = versification.bookAt(range.start);
   const genre = getBookGenre(book.id);
   const previous = neighbor(passage, -1, versification);
   const next = neighbor(passage, 1, versification);
   const isVerse = passage.kind === 'verse';
+  const passageId = toPassageOsisId(passage, versification);
+
+  // The links narrowed by word or kind: a verse's own choice, gone when another is opened.
+  const wordIndex = useOriginalWords()?.index ?? null;
+  const [chosen, setChosen] = useState<{
+    readonly passageId: string;
+    readonly selection: ConnectionSelection;
+  } | null>(null);
+  const selection = chosen?.passageId === passageId ? chosen.selection : NO_SELECTION;
+  const entries = useMemo(
+    () =>
+      isVerse && wordIndex
+        ? connectionWords(wordIndex, [...connections.outgoing, ...connections.incoming])
+        : null,
+    [isVerse, wordIndex, connections],
+  );
+  const selected = useMemo(
+    () =>
+      entries && isSelecting(selection)
+        ? new Set(
+            entries
+              .filter((entry) => isSelected(entry, selection))
+              .map((entry) => entry.connection),
+          )
+        : null,
+    [entries, selection],
+  );
+  const shownOf = (list: readonly Connection[]) =>
+    selected ? list.filter((connection) => selected.has(connection)) : list;
+  const highlight = useEffectEvent((shown: readonly Connection[] | null) => {
+    onHighlight?.(shown);
+  });
+  useEffect(() => {
+    highlight(selected && [...selected]);
+    return () => {
+      highlight(null);
+    };
+  }, [selected]);
 
   return (
     <div className={styles.panel}>
@@ -334,7 +389,7 @@ export function PassagePanel({
       )}
 
       {/* Keyed by passage: following a link starts the new passage's details at the top. */}
-      <div key={toPassageOsisId(passage, versification)} className={styles.scroll}>
+      <div key={passageId} className={styles.scroll}>
         {/* A verse's links follow its text; a chapter's come before its (long) list of verses. */}
         {passage.kind === 'verse' ? (
           <>{actions && <div className={styles.actions}>{actions}</div>}</>
@@ -354,13 +409,26 @@ export function PassagePanel({
           connections={[...connections.outgoing, ...connections.incoming]}
           verseGenres={verseGenres}
         />
+        {passage.kind === 'verse' && wordIndex && entries && entries.length > 0 && (
+          <ConnectionFilter
+            here={passage.verse}
+            index={wordIndex}
+            translation={translation}
+            entries={entries}
+            selection={selection}
+            shown={selected ? selected.size : entries.length}
+            onChange={(next) => {
+              setChosen({ passageId, selection: next });
+            }}
+          />
+        )}
         <ConnectionSection
           id="references"
           icon={OutgoingIcon}
           title={t('panel.references')}
           description={t('panel.references.note')}
           countLabel={t('panel.passages')}
-          connections={connections.outgoing}
+          connections={shownOf(connections.outgoing)}
           showSourceVerse={passage.kind === 'chapter'}
           data={data}
           onSelect={onSelect}
@@ -373,7 +441,7 @@ export function PassagePanel({
           title={t('panel.referencedBy')}
           description={t('panel.referencedBy.note')}
           countLabel={t('panel.passages')}
-          connections={connections.incoming}
+          connections={shownOf(connections.incoming)}
           showSourceVerse={passage.kind === 'chapter'}
           data={data}
           onSelect={onSelect}
@@ -524,8 +592,8 @@ function GenreBreakdown({
 }
 
 /**
- * One linked passage: a button that travels there, its text with the words it shares with the
- * verse being read marked, and the badge that says what those words are.
+ * One linked passage: a button that opens it in its book's context, its text with the words it
+ * shares with the verse being read marked, and the badge that says what those words are.
  */
 function ConnectionItem({
   connection,
@@ -546,6 +614,8 @@ function ConnectionItem({
   const { books } = localization;
   const { versification, translation } = data;
   const link = useLinkWords(connection, translation);
+  const [reading, setReading] = useState(false);
+  const marks = link ? (verse: VerseIndex) => linkMarks(link, verse) : undefined;
   const note = landingNote(connection, versification, showSourceVerse);
   const reference = formatVerseIndexRange(
     versification,
@@ -566,8 +636,9 @@ function ConnectionItem({
       <button
         type="button"
         className={styles.item}
+        aria-haspopup="dialog"
         onClick={() => {
-          onSelect(versePassage(connection.otherStart));
+          setReading(true);
         }}
         onFocus={() => {
           onPreview?.(connection);
@@ -589,9 +660,24 @@ function ConnectionItem({
           versification={versification}
           start={connection.otherStart}
           end={connection.otherEnd}
-          marks={link ? (verse) => linkMarks(link, verse) : undefined}
+          marks={marks}
         />
       </button>
+      {reading && (
+        <PassageContext
+          translation={translation}
+          versification={versification}
+          start={connection.otherStart}
+          end={connection.otherEnd}
+          marks={marks}
+          onGo={() => {
+            onSelect(versePassage(connection.otherStart));
+          }}
+          onClose={() => {
+            setReading(false);
+          }}
+        />
+      )}
       <CopyQuoteButton
         reference={reference}
         quote={() =>

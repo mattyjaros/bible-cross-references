@@ -12,7 +12,9 @@ export interface MeaningPair {
  * first:
  *
  * - `shared-word`: the same dictionary word stands in both. That is a fact about the texts, and
- *   the rarer the word, the more it says — so the words come least common first.
+ *   the rarer the word, the more it says — so the words come least common first. "The same" is
+ *   by Strong's number without its sense letter, so דֶּרֶךְ as "way / conduct" (`H1870G`) and as
+ *   "way / road" (`H1870K`) is one word. Words the two only gloss alike are kept in `alike`.
  * - `same-meaning`: no word is shared, but a word of each is glossed alike, e.g. Hebrew שָׁלוֹם and
  *   Greek εἰρήνη, both "peace". The only kind of evidence a link between the Testaments can have,
  *   since they are in different languages, and an approximation, since glosses are short.
@@ -23,7 +25,13 @@ export interface MeaningPair {
  * `maxVerses` verses) never count as evidence: two verses sharing "and" or "God" share nothing.
  */
 export type LinkEvidence =
-  | { readonly kind: 'shared-word'; readonly words: readonly OriginalWord[] }
+  | {
+      readonly kind: 'shared-word';
+      /** Each shared word as this passage has it, beside the form the other one has. */
+      readonly pairs: readonly MeaningPair[];
+      /** Words of this passage that are not shared but mean what one of the other's does. */
+      readonly alike: readonly MeaningPair[];
+    }
   | { readonly kind: 'same-meaning'; readonly pairs: readonly MeaningPair[] }
   | { readonly kind: 'thematic' };
 
@@ -50,7 +58,15 @@ export function meaningKeys(gloss: string): readonly string[] {
   return [...new Set([whole, ...parts])].filter((key) => key !== '');
 }
 
-function wordsOfRange(index: OriginalWordIndex, start: VerseIndex, end: VerseIndex) {
+/**
+ * A Strong's number without the letter that tells one sense of a word from another: `H1870G` and
+ * `H1870K` are both `H1870`, דֶּרֶךְ.
+ */
+export function dictionaryWord(strongs: string): string {
+  return /^[HG]\d+/.exec(strongs)?.[0] ?? strongs;
+}
+
+export function wordsOfRange(index: OriginalWordIndex, start: VerseIndex, end: VerseIndex) {
   const words = new Map<number, OriginalWord>();
   for (let verse = start; verse <= end; verse += 1) {
     for (const word of index.wordsOf(verse)) {
@@ -67,28 +83,39 @@ export function linkEvidence(
   otherEnd: VerseIndex,
 ): LinkEvidence {
   const ours = index.wordsOf(here);
-  const theirs = wordsOfRange(index, otherStart, otherEnd);
-  // `wordsOf` already lists the rarest first, so the order carries over.
-  const shared = ours.filter((word) => theirs.has(word.index));
-  if (shared.length > 0) {
-    return { kind: 'shared-word', words: shared };
-  }
+  // Rarest first, so the first match for a word or meaning is its rarest form.
+  const theirs = [...wordsOfRange(index, otherStart, otherEnd).values()].sort(
+    (a, b) => a.verseCount - b.verseCount,
+  );
+  const byWord = new Map<string, OriginalWord>();
   const byMeaning = new Map<string, OriginalWord>();
-  for (const word of [...theirs.values()].sort((a, b) => a.verseCount - b.verseCount)) {
+  for (const word of theirs) {
+    if (!byWord.has(dictionaryWord(word.strongs))) {
+      byWord.set(dictionaryWord(word.strongs), word);
+    }
     for (const key of meaningKeys(word.gloss)) {
       if (!byMeaning.has(key)) {
         byMeaning.set(key, word);
       }
     }
   }
-  const pairs: MeaningPair[] = [];
+  const shared: MeaningPair[] = [];
+  const alike: MeaningPair[] = [];
   for (const word of ours) {
+    const same = byWord.get(dictionaryWord(word.strongs));
+    if (same) {
+      shared.push({ here: word, there: same });
+      continue;
+    }
     const there = meaningKeys(word.gloss)
       .map((key) => byMeaning.get(key))
       .find((found) => found !== undefined);
     if (there) {
-      pairs.push({ here: word, there });
+      alike.push({ here: word, there });
     }
   }
-  return pairs.length > 0 ? { kind: 'same-meaning', pairs } : { kind: 'thematic' };
+  if (shared.length > 0) {
+    return { kind: 'shared-word', pairs: shared, alike };
+  }
+  return alike.length > 0 ? { kind: 'same-meaning', pairs: alike } : { kind: 'thematic' };
 }

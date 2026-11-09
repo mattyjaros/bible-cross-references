@@ -36,6 +36,8 @@ interface ThreadsStageProps {
    * marked where the chapter holds it (the selected verse keeps its own highlight).
    */
   readonly preview: Connection | null;
+  /** The selected verse's links the reader narrowed it to: these stand out, the rest fade. */
+  readonly highlight: readonly Connection[] | null;
   readonly onSelect: (passage: Passage | null) => void;
   /** A verse's address on the published site, for a card that is about to be sent. */
   readonly shareUrl: (passage: Passage) => string;
@@ -64,6 +66,7 @@ export function ThreadsStage({
   filter,
   direction,
   preview,
+  highlight,
   onSelect,
   shareUrl,
 }: ThreadsStageProps) {
@@ -115,15 +118,18 @@ export function ThreadsStage({
 
   const emphasizedVerse = hoverVerse ?? selectedVerse;
   const emphasizedBook = spineHover?.book ?? null;
-  // Only a thread that is drawn (the direction switch may hide it) can stand out alone.
-  const emphasizedLink = useMemo(() => {
-    const id = preview?.link.id;
-    if (id === undefined) return null;
-    for (const list of connectionsByVerse.values()) {
-      if (list.some((connection) => connection.link.id === id)) return id;
+  // One thread pointed at stands out alone; otherwise those the reader narrowed the panel to.
+  const emphasizedLinks = useMemo(() => {
+    if (!preview) {
+      return highlight && new Set(highlight.map((connection) => connection.link.id));
     }
-    return null;
-  }, [preview, connectionsByVerse]);
+    // The direction switch may hide the pointed-at thread; then nothing stands out alone.
+    const id = preview.link.id;
+    const drawn = [...connectionsByVerse.values()].some((list) =>
+      list.some((connection) => connection.link.id === id),
+    );
+    return drawn ? new Set([id]) : null;
+  }, [preview, highlight, connectionsByVerse]);
   const linked = preview && { start: preview.link.targetStart, end: preview.link.targetEnd };
 
   // Redraw on any input change, and on every scroll frame of the reading pane.
@@ -165,7 +171,7 @@ export function ThreadsStage({
         chapter: { start, end },
         emphasizedVerse,
         emphasizedBook,
-        emphasizedLink,
+        emphasizedLinks,
       });
     });
     scheduler.request();
@@ -188,7 +194,7 @@ export function ThreadsStage({
     end,
     emphasizedVerse,
     emphasizedBook,
-    emphasizedLink,
+    emphasizedLinks,
     // The spine is lettered: a change of language repaints it.
     books,
   ]);

@@ -32,8 +32,8 @@ export interface ThreadsDrawing {
   readonly emphasizedVerse: VerseIndex | null;
   /** A hovered book on the spine whose incoming threads stand out. */
   readonly emphasizedBook: BookId | null;
-  /** A link pointed at in the details panel: it alone stands out. */
-  readonly emphasizedLink: number | null;
+  /** Links pointed at or narrowed to in the details panel: they alone stand out. */
+  readonly emphasizedLinks: ReadonlySet<number> | null;
 }
 
 const TEXT = '#ecebe6';
@@ -56,10 +56,10 @@ export function drawThreads(context: CanvasRenderingContext2D, drawing: ThreadsD
 }
 
 function drawConnections(context: CanvasRenderingContext2D, drawing: ThreadsDrawing): void {
-  const { spine, gutterWidth, emphasizedVerse, emphasizedBook, emphasizedLink } = drawing;
+  const { spine, gutterWidth, emphasizedVerse, emphasizedBook, emphasizedLinks } = drawing;
   const bar = spineBar(drawing);
   const hasEmphasis =
-    emphasizedVerse !== null || emphasizedBook !== null || emphasizedLink !== null;
+    emphasizedVerse !== null || emphasizedBook !== null || emphasizedLinks !== null;
   const landsInBook = (connection: Connection) =>
     emphasizedBook !== null &&
     spine.segments.some(
@@ -79,8 +79,8 @@ function drawConnections(context: CanvasRenderingContext2D, drawing: ThreadsDraw
   for (const anchor of drawing.anchors) {
     for (const connection of drawing.connectionsByVerse.get(anchor.verse) ?? []) {
       const emphasized =
-        emphasizedLink !== null
-          ? connection.link.id === emphasizedLink
+        emphasizedLinks !== null
+          ? emphasizedLinks.has(connection.link.id)
           : anchor.verse === emphasizedVerse || landsInBook(connection);
       const weight = voteWeight(connection.link.votes);
       threads.push({

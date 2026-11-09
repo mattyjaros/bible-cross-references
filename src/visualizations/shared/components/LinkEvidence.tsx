@@ -7,7 +7,11 @@ import { ExpandIcon } from '../../../shared/ui/icons.tsx';
 import type { Translation } from '../../../translations/translation.ts';
 import { localizedGloss, useGlosses, type GlossTable } from '../../../words/glosses.ts';
 import { describeGrammar } from '../../../words/grammar.ts';
-import { linkEvidence, type LinkEvidence as Evidence } from '../../../words/link-evidence.ts';
+import {
+  linkEvidence,
+  type LinkEvidence as Evidence,
+  type MeaningPair,
+} from '../../../words/link-evidence.ts';
 import type { WordOccurrences } from '../../../words/load-word-occurrences.ts';
 import type { OriginalWord, OriginalWordIndex } from '../../../words/original-words.ts';
 import {
@@ -51,16 +55,16 @@ function evidenceWords(evidence: Evidence): {
   readonly here: readonly OriginalWord[];
   readonly there: readonly OriginalWord[];
 } {
+  const pairs = evidencePairs(evidence);
+  return { here: pairs.map((pair) => pair.here), there: pairs.map((pair) => pair.there) };
+}
+
+/** Every word of this passage the evidence names, beside the other passage's word for it. */
+function evidencePairs(evidence: Evidence): readonly MeaningPair[] {
   if (evidence.kind === 'shared-word') {
-    return { here: evidence.words, there: evidence.words };
+    return [...evidence.pairs, ...evidence.alike];
   }
-  if (evidence.kind === 'same-meaning') {
-    return {
-      here: evidence.pairs.map((pair) => pair.here),
-      there: evidence.pairs.map((pair) => pair.there),
-    };
-  }
-  return { here: [], there: [] };
+  return evidence.kind === 'same-meaning' ? evidence.pairs : [];
 }
 
 /** Where the words linking a passage to the verse being read stand in one of its verses. */
@@ -245,18 +249,24 @@ export function LinkEvidence({
   }
   const { evidence, index, aligner } = link;
   const here = aligner.align(connection.here);
-  // The translation's own word where it could be found, the gloss where it could not.
-  const named = evidenceWords(evidence).here.map(
-    (word) => here.get(word.index)?.text ?? localizedGloss(word, glosses).split(' / ')[0] ?? '',
-  );
-  // Every word, as the reader asked: the badge is where a link's shared vocabulary is read at a
-  // glance, and a "+2" hides exactly what it is for.
-  const shown = [...new Set(named)].join(', ');
+  // The translation's words where the aligner found them, else the gloss. All of them, no "+2".
+  const named = (pairs: readonly MeaningPair[]) =>
+    [
+      ...new Set(
+        pairs.map(
+          ({ here: word }) =>
+            here.get(word.index)?.text ?? localizedGloss(word, glosses).split(' / ')[0] ?? '',
+        ),
+      ),
+    ].join(', ');
   const label =
     evidence.kind === 'shared-word'
-      ? t('evidence.sharedWord')(shown, named.length)
+      ? [
+          t('evidence.sharedWord')(named(evidence.pairs), evidence.pairs.length),
+          ...(evidence.alike.length > 0 ? [t('evidence.sameMeaning')(named(evidence.alike))] : []),
+        ].join(' · ')
       : evidence.kind === 'same-meaning'
-        ? t('evidence.sameMeaning')(shown)
+        ? t('evidence.sameMeaning')(named(evidence.pairs))
         : t('evidence.thematic');
 
   const line = (word: OriginalWord, verse: VerseIndex) => (
@@ -271,6 +281,15 @@ export function LinkEvidence({
   );
   const there = (word: OriginalWord) =>
     firstVerseWith(word, index, connection.otherStart, connection.otherEnd);
+  // The other passage's word gets its own heading only when its number differs (another sense or word).
+  const item = ({ here: ours, there: theirs }: MeaningPair) => (
+    <div key={`${ours.strongs}-${theirs.strongs}`} className={styles.evidenceItem}>
+      <WordHeading word={ours} glosses={glosses} />
+      {line(ours, connection.here)}
+      {theirs.strongs !== ours.strongs && <WordHeading word={theirs} glosses={glosses} />}
+      {line(theirs, there(theirs))}
+    </div>
+  );
 
   return (
     <div className={styles.evidence}>
@@ -290,26 +309,17 @@ export function LinkEvidence({
           {evidence.kind === 'shared-word' && (
             <>
               <p className={styles.muted}>{t('evidence.sharedWord.note')}</p>
-              {evidence.words.map((word) => (
-                <div key={word.strongs} className={styles.evidenceItem}>
-                  <WordHeading word={word} glosses={glosses} />
-                  {line(word, connection.here)}
-                  {line(word, there(word))}
-                </div>
-              ))}
+              {evidence.pairs.map(item)}
             </>
           )}
+          {(evidence.kind === 'shared-word' ? evidence.alike : []).length > 0 && (
+            <p className={styles.muted}>{t('evidence.sameMeaning.note')}</p>
+          )}
+          {evidence.kind === 'shared-word' && evidence.alike.map(item)}
           {evidence.kind === 'same-meaning' && (
             <>
               <p className={styles.muted}>{t('evidence.sameMeaning.note')}</p>
-              {evidence.pairs.map(({ here: ours, there: theirs }) => (
-                <div key={`${ours.strongs}-${theirs.strongs}`} className={styles.evidenceItem}>
-                  <WordHeading word={ours} glosses={glosses} />
-                  {line(ours, connection.here)}
-                  <WordHeading word={theirs} glosses={glosses} />
-                  {line(theirs, there(theirs))}
-                </div>
-              ))}
+              {evidence.pairs.map(item)}
             </>
           )}
           {evidence.kind === 'thematic' && (

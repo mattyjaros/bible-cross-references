@@ -59,13 +59,19 @@ test.describe('reading the Bible', () => {
     await expect(page.locator(PANEL)).toHaveCount(0);
   });
 
-  test('a cross-reference can be followed to where it leads', async ({ page }) => {
+  test('a cross-reference opens in its context, and can be followed from there', async ({
+    page,
+  }) => {
     await openPassage(page, 'John.3.16');
     const link = page
       .locator(PANEL)
       .getByRole('button', { name: /^Romans 5:8/ })
       .first();
     await link.click();
+    const context = page.getByRole('dialog', { name: 'Romans 5:8' });
+    await expect(context.getByText('Chapter 5')).toBeVisible();
+    await expect(page).toHaveURL(/ref=John\.3\.16/);
+    await context.getByRole('button', { name: 'Go to this passage' }).click();
     await expect(page.locator(PANEL).getByRole('heading', { name: 'Romans 5:8' })).toBeVisible();
     await expect(page).toHaveURL(/ref=Rom\.5\.8/);
   });

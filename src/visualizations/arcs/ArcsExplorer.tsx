@@ -60,6 +60,12 @@ export function ArcsExplorer({
     readonly connection: Connection;
   } | null>(null);
   const previewed = preview?.passage === passage ? preview.connection : null;
+  // The links the reader narrowed the panel to, likewise.
+  const [highlight, setHighlight] = useState<{
+    readonly passage: Passage;
+    readonly connections: readonly Connection[];
+  } | null>(null);
+  const highlighted = highlight?.passage === passage ? highlight.connections : null;
 
   return (
     <VizPage
@@ -92,6 +98,9 @@ export function ArcsExplorer({
             onPreview={(connection) => {
               setPreview(connection && { passage, connection });
             }}
+            onHighlight={(connections) => {
+              setHighlight(connections && { passage, connections });
+            }}
           />
         )
       }
@@ -103,6 +112,7 @@ export function ArcsExplorer({
         filter={filter}
         focus={passage}
         preview={previewed}
+        highlight={highlighted}
         onSelect={onNavigate}
       />
       <LinkStats

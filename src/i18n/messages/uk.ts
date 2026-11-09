@@ -195,6 +195,23 @@ export const uk: LocaleMessages = {
     `у ${count} ${formOf(plural, 'вірші', 'віршах', 'віршах')} Біблії`,
   'evidence.loading': 'Завантаження вжитку слів…',
 
+  'context.earlier': 'Попередні вірші',
+  'context.later': 'Наступні вірші',
+  'context.open': 'Перейти до цього уривка',
+  'context.chapter': (chapter) => `Розділ ${chapter}`,
+
+  'linkFilter.title': 'Фільтрувати зв’язки',
+  'linkFilter.note': 'за словом або видом',
+  'linkFilter.words': 'Слова цього вірша',
+  'linkFilter.wordsNote': 'те саме єврейське чи грецьке слово або слово з тим самим значенням',
+  'linkFilter.kinds': 'Вид зв’язку',
+  'linkFilter.sharedWord': 'спільне слово',
+  'linkFilter.sameMeaning': 'те саме значення',
+  'linkFilter.shown': (shown, total, plural) =>
+    `${shown} з ${total} ${plural === 1 ? 'пов’язаного уривка' : 'пов’язаних уривків'}`,
+  'linkFilter.clear': 'Очистити',
+  'linkFilter.none': 'Жоден пов’язаний уривок не підходить.',
+
   'loading.data': (verses, links) =>
     `Завантаження ${verses} віршів і ${links} перехресних посилань…`,
   'error.datasetUnavailable':

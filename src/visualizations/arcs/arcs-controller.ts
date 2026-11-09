@@ -36,8 +36,8 @@ export interface ArcHover {
 export interface ArcPreview {
   /** The link's arc. */
   readonly links: ArcInstances;
-  /** The passage it points to, marked on the axis as a whole. */
-  readonly passage: VerseIndexRange;
+  /** The passage it points to, marked on the axis as a whole; none for several links at once. */
+  readonly passage: VerseIndexRange | null;
 }
 
 export interface ArcsControllerOptions {

@@ -166,6 +166,23 @@ export const es: LocaleMessages = {
     plural === 1 ? `en ${count} versículo de la Biblia` : `en ${count} versículos de la Biblia`,
   'evidence.loading': 'Cargando el uso de las palabras…',
 
+  'context.earlier': 'Versículos anteriores',
+  'context.later': 'Versículos siguientes',
+  'context.open': 'Ir a este pasaje',
+  'context.chapter': (chapter) => `Capítulo ${chapter}`,
+
+  'linkFilter.title': 'Filtrar vínculos',
+  'linkFilter.note': 'por palabra o tipo',
+  'linkFilter.words': 'Palabras de este versículo',
+  'linkFilter.wordsNote': 'la misma palabra hebrea o griega, o una del mismo significado',
+  'linkFilter.kinds': 'Tipo de vínculo',
+  'linkFilter.sharedWord': 'palabra común',
+  'linkFilter.sameMeaning': 'mismo significado',
+  'linkFilter.shown': (shown, total, plural) =>
+    `${shown} de ${total} ${plural === 1 ? 'pasaje vinculado' : 'pasajes vinculados'}`,
+  'linkFilter.clear': 'Borrar',
+  'linkFilter.none': 'Ningún pasaje vinculado coincide.',
+
   'loading.data': (verses, links) =>
     `Cargando ${verses} versículos y ${links} referencias cruzadas…`,
   'error.datasetUnavailable':
