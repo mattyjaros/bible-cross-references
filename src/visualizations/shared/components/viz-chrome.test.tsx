@@ -331,7 +331,7 @@ describe('Credits', () => {
 describe('SiteFooter', () => {
   it('says it is a modified version, and points at the source code', () => {
     render(<SiteFooter />);
-    expect(screen.getByRole('link', { name: 'modified version' }).getAttribute('href')).toContain(
+    expect(screen.getByRole('link', { name: 'modified' }).getAttribute('href')).toContain(
       'trekhleb/bible-cross-references',
     );
     expect(screen.getByRole('link', { name: /Source code on GitHub/ })).toBeDefined();

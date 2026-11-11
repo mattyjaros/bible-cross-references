@@ -247,7 +247,7 @@ export const pl: LocaleMessages = {
 
   'footer.source': 'Kod źródłowy na GitHubie',
   'footer.sourceLabel': 'GitHub',
-  'footer.modified': 'wersja zmodyfikowana',
+  'footer.modified': 'modyfikacja',
   'footer.original': 'Na podstawie otwartego projektu Bible Cross-References',
 
   // Sending a verse to somebody: the card, and the ways of passing it on.

@@ -240,7 +240,7 @@ export const de: LocaleMessages = {
 
   'footer.source': 'Quelltext auf GitHub',
   'footer.sourceLabel': 'GitHub',
-  'footer.modified': 'veränderte Fassung',
+  'footer.modified': 'Bearbeitung',
   'footer.original': 'Auf Grundlage des Open-Source-Projekts Bible Cross-References',
 
   'install.link': 'App installieren',
