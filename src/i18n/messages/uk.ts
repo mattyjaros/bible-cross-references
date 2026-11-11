@@ -267,6 +267,8 @@ export const uk: LocaleMessages = {
 
   'footer.source': 'Вихідний код на GitHub',
   'footer.sourceLabel': 'GitHub',
+  'footer.modified': 'змінена версія',
+  'footer.original': 'На основі відкритого проєкту Bible Cross-References',
 
   'install.link': 'Встановити застосунок',
   'install.linkLabel': 'Встановити',

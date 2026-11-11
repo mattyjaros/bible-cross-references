@@ -253,6 +253,8 @@ export const en = {
 
   'footer.source': 'Source code on GitHub',
   'footer.sourceLabel': 'GitHub',
+  'footer.modified': 'modified version',
+  'footer.original': 'Based on the open-source Bible Cross-References project',
 
   'install.link': 'Install the app',
   'install.linkLabel': 'Install',

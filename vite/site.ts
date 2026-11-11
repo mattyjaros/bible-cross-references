@@ -46,12 +46,6 @@ export const SITE_URL = new URL(
   SITE_ORIGIN,
 ).href;
 
-export const AUTHOR = {
-  name: 'Oleksii Trekhleb',
-  url: 'https://trekhleb.dev',
-  twitter: '@Trekhleb',
-};
-
 /**
  * The size every share picture is drawn at: twice the usual 1200×630, so it stays sharp on
  * high-density screens after platforms scale it down. Which file a page points at depends on its

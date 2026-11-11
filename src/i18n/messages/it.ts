@@ -236,6 +236,8 @@ export const it: LocaleMessages = {
 
   'footer.source': 'Codice sorgente su GitHub',
   'footer.sourceLabel': 'GitHub',
+  'footer.modified': 'versione modificata',
+  'footer.original': 'Basata sul progetto open source Bible Cross-References',
 
   'install.link': 'Installa l’app',
   'install.linkLabel': 'Installa',

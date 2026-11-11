@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   atEndOfHead,
-  AUTHOR,
   DEPLOY_BASE,
   PAGE_LIST,
   pageOf,
@@ -21,10 +20,8 @@ describe('the site', () => {
     expect(SITE_URL.startsWith('https://')).toBe(true);
   });
 
-  it('names itself and its author', () => {
+  it('names itself', () => {
     expect(SITE_NAME).toBe('Bible Cross-References');
-    expect(AUTHOR.name).toBeTruthy();
-    expect(AUTHOR.url.startsWith('https://')).toBe(true);
     for (const page of PAGE_LIST) {
       const social = socialImageOf(page);
       expect(social.file).toMatch(/\.(png|jpe?g)$/);

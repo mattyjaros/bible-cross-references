@@ -11,7 +11,6 @@ import { TRANSLATION_MANIFESTS } from '../src/translations/registry.ts';
 import { vizCrossReferenceSource } from '../src/visualizations/shared/viz-datasets.ts';
 import {
   atEndOfHead,
-  AUTHOR,
   PAGE_LIST,
   pageOf,
   pageUrl,
@@ -133,7 +132,6 @@ export function siteHead(): Plugin {
         }
       }
       tags.push(
-        meta('name', 'author', AUTHOR.name),
         meta('property', 'og:type', 'website'),
         meta('property', 'og:site_name', copy.siteName),
         meta('property', 'og:locale', copy.ogLocale),
@@ -145,7 +143,6 @@ export function siteHead(): Plugin {
         meta('property', 'og:image:height', String(social.height)),
         meta('property', 'og:image:alt', social.alt),
         meta('name', 'twitter:card', 'summary_large_image'),
-        meta('name', 'twitter:creator', AUTHOR.twitter),
         meta('name', 'twitter:title', title),
         meta('name', 'twitter:description', description),
         meta('name', 'twitter:image', image),
@@ -195,7 +192,6 @@ export function siteHead(): Plugin {
           browserRequirements: 'Requires JavaScript and WebGL 2',
           isAccessibleForFree: true,
           inLanguage: page.locale,
-          author: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.url },
         };
         tags.push({
           tag: 'script',
