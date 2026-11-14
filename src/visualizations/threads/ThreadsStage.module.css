@@ -12,6 +12,10 @@
   padding: 0 var(--space-4) var(--space-8) var(--space-6);
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Scroll anchoring would undo the header condensing: the header shrinks, the browser scrolls
+     back by as much to keep the verses still, that lands under the threshold, the header grows,
+     and the browser scrolls forward again — a loop that never settles. */
+  overflow-anchor: none;
 }
 
 /* The chapter header sticks to the top; after a little scrolling it condenses into a slim bar
